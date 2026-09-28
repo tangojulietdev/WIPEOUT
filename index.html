@@ -887,7 +887,7 @@ const BUILTIN_FIREBASE_CONFIG={
 const BUILTIN_PR_TOKEN="6e531ec041f64580582bca34414dc2abc6b03a7e";
 /* Bump this every time index.html or sw.js changes, so it's visible in Settings/Menu
    and you can tell at a glance whether a phone has picked up the latest update. */
-const APP_VERSION="v5";
+const APP_VERSION="v6";
 function bootWipeOut(){
   const saved=localGet(LK.cfg,null)||BUILTIN_FIREBASE_CONFIG;
   applyTheme(localGet(LK.theme,null));
@@ -1836,6 +1836,20 @@ function openSettings(){
 }
 
 /* UPI collect */
+async function shareQrImage(qrUrl,caption){
+  try{
+    if(!(navigator.share&&navigator.canShare))throw new Error("no-share-api");
+    const res=await fetch(qrUrl);
+    if(!res.ok)throw new Error("fetch-failed");
+    const blob=await res.blob();
+    const file=new File([blob],"upi-qr.png",{type:blob.type||"image/png"});
+    if(!navigator.canShare({files:[file]}))throw new Error("files-not-shareable");
+    await navigator.share({files:[file],text:caption||undefined,title:"UPI QR"});
+  }catch(err){
+    if(err&&err.name==="AbortError")return; // user cancelled the share sheet, not an error
+    toast("Can't auto-share the image on this device/browser. Long-press the QR above, save it, then attach it manually in WhatsApp.","err");
+  }
+}
 function openUpiPay(amount,note,onPaid){
   if(!(config.upiId||"").trim()){toast("Add your UPI ID in Settings","err");openSettings();return;}
   const str=upiString(config,amount,note);
@@ -1845,10 +1859,13 @@ function openUpiPay(amount,note,onPaid){
       <div style="display:inline-block;background:#fff;padding:12px;border-radius:18px;box-shadow:var(--shadow-2)"><img src="${qr}" alt="UPI QR code" width="220" height="220" style="display:block;border-radius:8px"></div>
       <div class="muted" style="font-size:13px;margin-top:14px">Scan with any UPI app, or</div>
       <a class="btn primary block" href="${str}" style="margin-top:8px">Open UPI app</a>
+      <button type="button" class="btn ghost block" id="upiShareQr" style="margin-top:8px">Share QR image (WhatsApp, etc.)</button>
       <div class="muted" style="font-size:12px;margin-top:12px">Paying to ${esc(config.upiId)}</div>
       <div class="muted" style="font-size:11.5px;margin-top:4px;line-height:1.4">The app cannot auto-confirm a UPI payment. Tap Mark received once the money is in.</div>
     </div>
   `,[{label:"Close",cls:"ghost",fn:closeSheet},{label:"Mark received",cls:"primary",fn:()=>{closeSheet();if(onPaid)onPaid();}}]);
+  const shareBtn=$("#upiShareQr");
+  if(shareBtn)shareBtn.onclick=()=>shareQrImage(qr,"Pay "+money(amount)+" to "+config.upiId+(note?" ("+note+")":""));
 }
 
 /* ============================ Team (owner only: staff roster + employee app logins) ============================ */
