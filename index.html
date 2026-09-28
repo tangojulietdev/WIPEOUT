@@ -594,7 +594,7 @@ function parseFirebaseConfig(text){
 /* ---------------- Catalog helpers (pure, testable) ---------------- */
 const DEFAULT_VEH=["Hatchback","Sedan","SUV / MUV","Bike","Auto","Truck / Bus","Other"];
 const DEFAULT_SERVICES=["Exterior Wash","Full Wash","Premium Spa","Interior Detail","Polish / Wax","Underbody","Other"];
-const DEFAULT_WA_TEMPLATE="Hi {name}, your {vehicle} ({plate}) wash is complete! Total {amount}. Pay via UPI: {upi}\nThank you for choosing {shop}.";
+const DEFAULT_WA_TEMPLATE="Hi {name}, your {vehicle} ({plate}) wash is complete! Total {amount}.\nPay via UPI: {upi}\n(If that doesn't open your UPI app, pay {payamt} to UPI ID {upiid} instead)\nThank you for choosing {shop}.";
 const PAY_INCOME=["Wash top-up","Tips","Other income"];
 const PAY_EXPENSE=["Salary","Advance","Supplies / Items","Equipment","Rent","Utilities","Maintenance","Other"];
 function defaultConfig(businessName){
@@ -623,14 +623,17 @@ function upiString(cfg,amount,note){
 /* ---------------- WhatsApp ---------------- */
 function waApplyTemplate(tpl,e,cfg){
   const t=tpl||DEFAULT_WA_TEMPLATE;
+  const upiId=((cfg&&cfg.upiId)||"").trim();
   const payAmt=(e&&e.due>0)?e.due:((e&&e.amount)||0);
-  const upiLink=((cfg&&cfg.upiId)||"").trim()?upiString(cfg,payAmt,(e&&e.vehicleNumber)||""):"";
+  const upiLink=upiId?upiString(cfg,payAmt,(e&&e.vehicleNumber)||""):"";
   return t
     .replace(/\{name\}/g,(e&&e.name)||"there")
     .replace(/\{vehicle\}/g,(e&&(e.vehicleName||e.vehicleType))||"vehicle")
     .replace(/\{plate\}/g,(e&&e.vehicleNumber)||"")
     .replace(/\{amount\}/g,money(e&&e.amount))
     .replace(/\{upi\}/g,upiLink)
+    .replace(/\{upiid\}/g,upiId)
+    .replace(/\{payamt\}/g,money(payAmt))
     .replace(/\{shop\}/g,(cfg&&cfg.businessName)||"Wipe Out");
 }
 function waLink(phone,message){
@@ -884,7 +887,7 @@ const BUILTIN_FIREBASE_CONFIG={
 const BUILTIN_PR_TOKEN="6e531ec041f64580582bca34414dc2abc6b03a7e";
 /* Bump this every time index.html or sw.js changes, so it's visible in Settings/Menu
    and you can tell at a glance whether a phone has picked up the latest update. */
-const APP_VERSION="v4";
+const APP_VERSION="v5";
 function bootWipeOut(){
   const saved=localGet(LK.cfg,null)||BUILTIN_FIREBASE_CONFIG;
   applyTheme(localGet(LK.theme,null));
@@ -1807,7 +1810,7 @@ function openSettings(){
     <div class="field"><label>Your UPI ID</label><input id="setUpi" placeholder="name@bank" value="${esc(config.upiId||"")}" autocapitalize="off" autocomplete="off"><div class="hint">Shows a UPI QR and opens the customer's UPI app. You confirm receipt with Mark received.</div></div>
 
     <div class="section-title">WhatsApp wash update</div>
-    <div class="field"><label>Message template</label><textarea id="setWaTpl">${esc(config.waTemplate||DEFAULT_WA_TEMPLATE)}</textarea><div class="hint">Placeholders: {name} {vehicle} {plate} {amount} {shop} {upi} — {upi} inserts a tap-to-pay UPI link (not a QR image, WhatsApp's free chat link can't attach images, but a tappable link works even better here since the customer is already looking at it on their own phone). Only appears if your UPI ID is set above.</div></div>
+    <div class="field"><label>Message template</label><textarea id="setWaTpl">${esc(config.waTemplate||DEFAULT_WA_TEMPLATE)}</textarea><div class="hint">Placeholders: {name} {vehicle} {plate} {amount} {shop} {upi} {upiid} {payamt} — {upi} is a tap-to-pay link, but on some phones WhatsApp intercepts it into its own WhatsApp Pay instead of the customer's usual UPI app. {upiid} and {payamt} give the plain UPI ID and amount as backup text they can type into any UPI app themselves. All UPI placeholders need your UPI ID set above.</div></div>
     <div class="field wtoggle"><label>Prompt to send WhatsApp when a wash is marked done</label><div class="switch ${config.waAutoPrompt!==false?"on":""}" id="setWaAuto" role="switch" aria-checked="${config.waAutoPrompt!==false}"><div class="kn"></div></div></div>
 
     <div class="section-title">Team</div>
