@@ -1664,9 +1664,23 @@ function openWashForm(id){
     const file=ev.target.files[0];if(!file)return;
     const btn=$("#wScan");const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span>Scanning plate...';
     try{
+      if(navigator.onLine===false){toast("No internet connection","err");return;}
       const fd=new FormData();fd.append("upload",file);fd.append("regions","in");
-      const res=await fetch("https://api.platerecognizer.com/v1/plate-reader/",{method:"POST",headers:{Authorization:"Token "+((config.prToken||"").trim()||BUILTIN_PR_TOKEN)},body:fd});
-      if(res.status===401||res.status===403){toast("Invalid plate scan key","err");return;}
+      let res;
+      try{
+        res=await fetch("https://api.platerecognizer.com/v1/plate-reader/",{method:"POST",headers:{Authorization:"Token "+((config.prToken||"").trim()||BUILTIN_PR_TOKEN)},body:fd});
+      }catch(netErr){
+        toast("Scan failed: couldn't reach the plate-scan server (blocked by network/CORS or offline). "+(netErr&&netErr.message?netErr.message:""),"err");
+        return;
+      }
+      if(res.status===401||res.status===403){toast("Plate scan key rejected (invalid token, or domain restricted in Plate Recognizer dashboard)","err");return;}
+      if(res.status===429){toast("Plate scan monthly quota used up, check platerecognizer.com usage","err");return;}
+      if(!res.ok){
+        let detail="";
+        try{const j=await res.json();detail=(j&&(j.detail||JSON.stringify(j)))||"";}catch(e){}
+        toast("Scan failed (server said "+res.status+"). "+detail,"err");
+        return;
+      }
       const data=await res.json();
       const plate=formatPlate(data&&data.results&&data.results[0]&&data.results[0].plate);
       if(!plate){toast("No plate detected, try a clearer photo","err");return;}
@@ -1674,7 +1688,7 @@ function openWashForm(id){
       const m=filterVehicles(vehIndex,plate).find(x=>x.number===plate);
       if(m){applyVehicle(m);toast(plate+" · "+(m.name||m.phone||"owner found"));}
       else toast(plate+" · new vehicle, add details");
-    }catch(err){toast("Scan failed, check internet","err");}
+    }catch(err){toast("Scan failed: "+((err&&err.message)||"unknown error"),"err");}
     finally{btn.disabled=false;btn.innerHTML=orig;ev.target.value="";}
   };
   $("#wCollect").onclick=()=>{const amt=parseFloat($("#wAmt").value)||0;if(!(amt>0)){toast("Enter an amount first","err");return;}openUpiPay(amt,wNum.value.trim(),()=>setPay("UPI"));};
