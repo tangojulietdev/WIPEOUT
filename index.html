@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1f22">
+<meta name="description" content="Wash queue, live team sync, price catalog, WhatsApp updates, UPI payments and finance for your car wash and auto spa.">
+<title>Wipe Out</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Wipe Out">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f1efea; --surface:#ffffff; --surface-2:#f7f5ef; --surface-3:#ece8df;
+  --border:#e5e0d6; --border-2:#d6d1c5;
+  --text:#1b1e1c; --text-2:#5b615c; --text-3:#8b918b;
+  --primary:#c98a1f; --primary-deep:#a6711a; --primary-soft:#f6ecd6; --on-primary:#231703;
+  --accent:#8a5d10;
+  --hero-bg:#1b1f22; --hero-text:#f3f5f4; --hero-accent:#ecb659;
+  --success:#16a34a; --success-soft:#dcfce7;
+  --danger:#dc2626; --danger-soft:#fde7e7;
+  --warning:#b8770c; --warning-soft:#fbf0d8;
+  --cash:#16a34a; --upi:#2563eb; --due:#dc2626; --other:#7c3aed;
+  --shadow-1:0 1px 2px rgba(28,24,16,.05),0 1px 3px rgba(28,24,16,.05);
+  --shadow-2:0 4px 12px rgba(28,24,16,.08),0 2px 4px rgba(28,24,16,.05);
+  --shadow-3:0 12px 32px rgba(28,24,16,.16);
+  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:26px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --font-h:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-b:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+html{color-scheme:light}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121517; --surface:#1b1f22; --surface-2:#15191b; --surface-3:#242a2e;
+  --border:#2a3034; --border-2:#373e43;
+  --text:#eef1f2; --text-2:#a6aeb2; --text-3:#727b7f;
+  --primary:#e3ab43; --primary-deep:#c79233; --primary-soft:#2c2516; --on-primary:#1b1503;
+  --accent:#ecb659;
+  --hero-bg:#0d1011; --hero-text:#f3f5f4; --hero-accent:#ecb659;
+  --success:#43c478; --success-soft:#13271c;
+  --danger:#f06d6d; --danger-soft:#2c1616;
+  --warning:#e3ab43; --warning-soft:#2a2210;
+  --cash:#43c478; --upi:#5aa6f0; --due:#f06d6d; --other:#b08be0;
+  --shadow-1:0 1px 2px rgba(0,0,0,.32);
+  --shadow-2:0 6px 16px rgba(0,0,0,.42);
+  --shadow-3:0 14px 36px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-b); background:var(--bg); color:var(--text);
+  font-size:16px; line-height:1.5; min-height:100dvh;
+  -webkit-font-smoothing:antialiased; overscroll-behavior-y:none;
+}
+h1,h2,h3,h4{font-family:var(--font-h); margin:0; line-height:1.25; letter-spacing:-.01em}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit}
+input,select,textarea{font-family:inherit; font-size:16px; color:var(--text)}
+.num{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- App shell ---------- */
+#app{max-width:560px; margin:0 auto; min-height:100dvh; position:relative}
+header.appbar{
+  position:sticky; top:0; z-index:40; background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 12px;
+  display:flex; align-items:center; gap:12px;
+}
+.brand{display:flex; align-items:center}
+.brand .name{font-family:var(--font-h); font-weight:700; font-size:20px; letter-spacing:.15em; text-transform:uppercase; line-height:1}
+.brand .name span{color:var(--accent); margin-left:.32em}
+.brand .sub{font-size:9px; color:var(--text-3); margin-top:6px; letter-spacing:.28em; text-transform:uppercase; font-weight:600}
+.appbar .spacer{flex:1}
+.iconbtn{width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
+  color:var(--text-2); transition:background .18s, color .18s}
+.iconbtn:hover{background:var(--surface-2)}
+.iconbtn:active{transform:scale(.94)}
+.iconbtn svg{width:21px; height:21px}
+
+main{padding:16px 16px calc(96px + var(--safe-b)); }
+.view{display:none; animation:fade .22s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- Bottom nav ---------- */
+nav.bottom{
+  position:fixed; left:0; right:0; bottom:0; z-index:45;
+  background:var(--surface); border-top:1px solid var(--border);
+  padding:6px 6px calc(6px + var(--safe-b));
+  display:flex; max-width:560px; margin:0 auto;
+}
+nav.bottom button{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:7px 2px; border-radius:14px; color:var(--text-3);
+  font-size:11px; font-weight:600; transition:color .18s;
+}
+nav.bottom button svg{width:23px; height:23px; transition:transform .18s}
+nav.bottom button.active{color:var(--accent)}
+nav.bottom button.active svg{transform:translateY(-1px)}
+nav.bottom button:active svg{transform:scale(.9)}
+nav.bottom button .dot{position:absolute; transform:translate(13px,-2px); width:7px; height:7px;
+  border-radius:50%; background:var(--danger); border:2px solid var(--surface)}
+
+/* ---------- Cards & common ---------- */
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-1)}
+.section-title{font-size:13px; font-weight:600; color:var(--text-3); text-transform:uppercase;
+  letter-spacing:.06em; margin:22px 2px 10px; display:flex; align-items:center; gap:8px}
+.section-title:first-child{margin-top:4px}
+.row{display:flex; align-items:center; gap:12px}
+.muted{color:var(--text-2)}
+.pill{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px;
+  font-size:12px; font-weight:600; line-height:1.4}
+.pill.cash{background:var(--success-soft); color:var(--success)}
+.pill.upi{background:#e3edfd; color:var(--upi)}
+html[data-theme="dark"] .pill.upi{background:#10233f}
+.pill.due{background:var(--danger-soft); color:var(--danger)}
+.pill.part{background:var(--warning-soft); color:var(--warning)}
+.pill.type{background:var(--surface-3); color:var(--text-2)}
+
+/* Stat grid */
+.stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.stat{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-md);
+  padding:13px 14px; box-shadow:var(--shadow-1)}
+.stat .lbl{font-size:12px; color:var(--text-2); font-weight:500; display:flex; align-items:center; gap:6px}
+.stat .lbl svg{width:15px; height:15px}
+.stat .val{font-family:var(--font-h); font-weight:700; font-size:22px; margin-top:6px; letter-spacing:-.02em}
+.stat .val.sm{font-size:18px}
+.stat.hero{grid-column:1/-1; background:var(--hero-bg); border:none; color:var(--hero-text)}
+.stat.hero .lbl{color:rgba(255,255,255,.85)}
+.stat.hero .val{font-size:30px; color:var(--hero-accent)}
+.stat.accent-green .val{color:var(--success)}
+.stat.accent-blue .val{color:var(--upi)}
+.stat.accent-red .val{color:var(--danger)}
+
+/* Wash entry card */
+.entry{display:flex; align-items:center; gap:13px; padding:13px 14px;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-md);
+  box-shadow:var(--shadow-1); margin-bottom:9px; transition:transform .15s, box-shadow .15s}
+.entry:active{transform:scale(.995)}
+.entry .veh{width:46px; height:46px; border-radius:12px; background:var(--primary-soft);
+  color:var(--primary-deep); display:grid; place-items:center; flex-shrink:0}
+html[data-theme="dark"] .entry .veh{color:var(--primary)}
+.entry .veh svg{width:24px; height:24px}
+.entry .mid{flex:1; min-width:0}
+.entry .top{display:flex; align-items:center; gap:8px}
+.entry .plate{font-weight:700; font-size:15px; letter-spacing:.02em}
+.entry .owner{font-size:13px; color:var(--text-2); margin-top:2px; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis}
+.entry .amt{text-align:right; flex-shrink:0}
+.entry .amt .big{font-family:var(--font-h); font-weight:700; font-size:16px}
+.entry .amt .due{font-size:12px; color:var(--danger); font-weight:600; margin-top:2px}
+
+.empty{text-align:center; padding:40px 20px; color:var(--text-3)}
+.empty svg{width:46px; height:46px; opacity:.5; margin-bottom:10px}
+.empty p{margin:0; font-size:14px}
+
+/* Buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:13px 18px; border-radius:14px; font-weight:600; font-size:15px;
+  transition:transform .12s, box-shadow .18s, background .18s; touch-action:manipulation}
+.btn:active{transform:scale(.97)}
+.btn svg{width:19px; height:19px}
+.btn.primary{background:var(--primary); color:var(--on-primary); box-shadow:var(--shadow-2)}
+.btn.primary:hover{background:var(--primary-deep)}
+.btn.ghost{background:var(--surface-2); color:var(--text); border:1px solid var(--border)}
+.btn.danger{background:var(--danger-soft); color:var(--danger)}
+.btn.block{width:100%}
+.fab-wrap{position:sticky; bottom:0}
+.add-btn{position:fixed; right:calc(50% - 280px + 18px); bottom:calc(80px + var(--safe-b));
+  z-index:42; width:auto}
+@media(max-width:596px){.add-btn{right:18px}}
+
+/* Tabs / segmented */
+.seg{display:flex; background:var(--surface-2); border:1px solid var(--border);
+  border-radius:14px; padding:4px; gap:4px}
+.seg button{flex:1; padding:9px 6px; border-radius:10px; font-weight:600; font-size:13px;
+  color:var(--text-2); transition:background .18s, color .18s}
+.seg button.active{background:var(--surface); color:var(--accent); box-shadow:var(--shadow-1)}
+html[data-theme="dark"] .seg button.active{background:var(--surface-3)}
+
+.period-nav{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:14px 0 6px}
+.period-nav .label{font-family:var(--font-h); font-weight:600; font-size:15px}
+.period-nav .navbtns{display:flex; gap:6px}
+.period-nav .navbtns button{width:36px; height:36px; border-radius:11px; background:var(--surface-2);
+  border:1px solid var(--border); display:grid; place-items:center; color:var(--text-2)}
+.period-nav .navbtns button:disabled{opacity:.4}
+.period-nav .navbtns button svg{width:18px; height:18px}
+
+/* Charts */
+.chart-card{padding:16px 14px 12px}
+.chart-card h3{font-size:14px; margin-bottom:2px}
+.chart-card .cap{font-size:12px; color:var(--text-3); margin-bottom:10px}
+.bars{width:100%; display:block}
+.donut-wrap{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+.legend{display:flex; flex-direction:column; gap:9px; flex:1; min-width:130px}
+.legend .lg{display:flex; align-items:center; gap:9px; font-size:13px}
+.legend .sw{width:11px; height:11px; border-radius:3px; flex-shrink:0}
+.legend .lg .v{margin-left:auto; font-weight:700; font-variant-numeric:tabular-nums}
+.tip{fill:var(--text); font-size:11px; font-weight:600; font-family:var(--font-b)}
+
+/* Customers */
+.search{display:flex; align-items:center; gap:10px; background:var(--surface);
+  border:1px solid var(--border); border-radius:14px; padding:11px 14px; box-shadow:var(--shadow-1)}
+.search svg{width:19px; height:19px; color:var(--text-3); flex-shrink:0}
+.search input{flex:1; border:none; outline:none; background:none; font-size:15px}
+.cust{display:flex; align-items:center; gap:13px; padding:13px 14px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-1); margin-bottom:9px}
+.cust .av{width:44px; height:44px; border-radius:50%; background:var(--primary-soft);
+  color:var(--primary-deep); display:grid; place-items:center; font-weight:700; font-size:16px; flex-shrink:0}
+html[data-theme="dark"] .cust .av{color:var(--primary)}
+.cust .mid{flex:1; min-width:0}
+.cust .nm{font-weight:600; font-size:15px}
+.cust .meta{font-size:12.5px; color:var(--text-2); margin-top:2px; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis}
+.cust .stat-r{text-align:right; flex-shrink:0}
+.cust .stat-r .sp{font-weight:700; font-family:var(--font-h); font-size:14px}
+.cust .stat-r .vs{font-size:11px; color:var(--text-3); margin-top:2px}
+
+/* Finance */
+.fin-row{display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-1); margin-bottom:8px}
+.fin-row .ic{width:40px; height:40px; border-radius:11px; display:grid; place-items:center; flex-shrink:0}
+.fin-row .ic svg{width:20px; height:20px}
+.fin-row.income .ic{background:var(--success-soft); color:var(--success)}
+.fin-row.expense .ic{background:var(--danger-soft); color:var(--danger)}
+.fin-row .mid{flex:1; min-width:0}
+.fin-row .d{font-weight:600; font-size:14.5px}
+.fin-row .c{font-size:12px; color:var(--text-3); margin-top:2px}
+.fin-row .amt{font-family:var(--font-h); font-weight:700; font-size:15px; flex-shrink:0}
+.fin-row.income .amt{color:var(--success)}
+.fin-row.expense .amt{color:var(--danger)}
+.catbar{display:flex; flex-direction:column; gap:8px}
+.catbar .cb{}
+.catbar .cb .crow{display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px}
+.catbar .cb .track{height:8px; border-radius:6px; background:var(--surface-3); overflow:hidden}
+.catbar .cb .fill{height:100%; border-radius:6px; background:var(--danger)}
+
+/* Reminders */
+.rem{display:flex; align-items:flex-start; gap:12px; padding:13px 14px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-1); margin-bottom:9px}
+.rem .chk{width:24px; height:24px; border-radius:7px; border:2px solid var(--border-2);
+  flex-shrink:0; margin-top:1px; display:grid; place-items:center; transition:.18s; cursor:pointer}
+.rem .chk svg{width:15px; height:15px; opacity:0; color:#fff}
+.rem.done .chk{background:var(--success); border-color:var(--success)}
+.rem.done .chk svg{opacity:1}
+.rem .mid{flex:1; min-width:0}
+.rem.done .t{text-decoration:line-through; color:var(--text-3)}
+.rem .t{font-weight:600; font-size:14.5px}
+.rem .sub{font-size:12.5px; color:var(--text-2); margin-top:3px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.rem .sub .od{color:var(--danger); font-weight:600}
+.rem .x{color:var(--text-3); padding:4px}
+
+/* Modal */
+.scrim{position:fixed; inset:0; background:rgba(8,15,25,.5); z-index:90; opacity:0;
+  pointer-events:none; transition:opacity .25s; backdrop-filter:blur(2px)}
+.scrim.show{opacity:1; pointer-events:auto}
+.sheet{position:fixed; left:0; right:0; bottom:0; z-index:91; max-width:560px; margin:0 auto;
+  background:var(--surface); border-radius:24px 24px 0 0; box-shadow:var(--shadow-3);
+  transform:translateY(100%); transition:transform .3s cubic-bezier(.2,.7,.2,1);
+  max-height:92dvh; display:flex; flex-direction:column}
+.sheet.show{transform:translateY(0)}
+.sheet .grab{width:38px; height:4px; border-radius:3px; background:var(--border-2);
+  margin:10px auto 4px}
+.sheet .shead{display:flex; align-items:center; padding:6px 18px 12px; gap:12px}
+.sheet .shead h2{font-size:18px; flex:1}
+.sheet .sbody{padding:4px 18px calc(20px + var(--safe-b)); overflow-y:auto}
+.field{margin-bottom:14px}
+.field label{display:block; font-size:13px; font-weight:600; color:var(--text-2); margin-bottom:6px}
+.field label .req{color:var(--danger)}
+.field input,.field select,.field textarea{width:100%; padding:13px 14px; border-radius:12px;
+  border:1.5px solid var(--border); background:var(--surface-2); outline:none; transition:border .18s, background .18s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary); background:var(--surface)}
+.field textarea{resize:vertical; min-height:60px}
+.field .hint{font-size:12px; color:var(--text-3); margin-top:5px}
+.field.err input,.field.err select{border-color:var(--danger)}
+.field.ac-host{position:relative}
+.ac{position:absolute; left:0; right:0; top:100%; margin-top:5px; z-index:30;
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  box-shadow:var(--shadow-3); max-height:212px; overflow-y:auto; display:none}
+.ac.show{display:block}
+.ac .it{display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:11px 13px; border-bottom:1px solid var(--border); cursor:pointer}
+.ac .it:last-child{border-bottom:none}
+.ac .it:active,.ac .it:hover{background:var(--surface-2)}
+.ac .it .vn{font-weight:700; font-size:14px; letter-spacing:.02em}
+.ac .it .nm{font-size:12.5px; color:var(--text-2); text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.field .errmsg{font-size:12px; color:var(--danger); margin-top:5px; display:none}
+.field.err .errmsg{display:block}
+.f2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.paychip{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+.paychip button{padding:11px 4px; border-radius:12px; border:1.5px solid var(--border);
+  background:var(--surface-2); font-weight:600; font-size:13px; color:var(--text-2); transition:.16s}
+.paychip button.on{border-color:var(--primary); background:var(--primary-soft); color:var(--primary-deep)}
+html[data-theme="dark"] .paychip button.on{color:var(--primary)}
+.sheet .sfoot{display:flex; gap:10px; padding:12px 18px calc(16px + var(--safe-b));
+  border-top:1px solid var(--border); background:var(--surface)}
+.sheet .sfoot .btn{flex:1}
+
+/* menu sheet list */
+.menu-item{display:flex; align-items:center; gap:14px; padding:15px 4px; font-weight:500;
+  border-bottom:1px solid var(--border)}
+.menu-item:last-child{border-bottom:none}
+.menu-item svg{width:21px; height:21px; color:var(--text-2)}
+.menu-item.danger{color:var(--danger)} .menu-item.danger svg{color:var(--danger)}
+
+/* Toast */
+#toast{position:fixed; left:50%; bottom:calc(96px + var(--safe-b));
+  transform:translateX(-50%) translateY(20px); z-index:100; background:var(--text); color:var(--surface);
+  padding:12px 18px; border-radius:14px; font-size:14px; font-weight:600; box-shadow:var(--shadow-3);
+  opacity:0; pointer-events:none; transition:.28s; max-width:90%; display:flex; align-items:center; gap:9px}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+#toast svg{width:18px; height:18px; flex-shrink:0}
+
+.detail-stat{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:6px 0 14px}
+.detail-stat .ds{background:var(--surface-2); border-radius:12px; padding:11px; text-align:center}
+.detail-stat .ds .v{font-family:var(--font-h); font-weight:700; font-size:17px}
+.detail-stat .ds .l{font-size:11px; color:var(--text-3); margin-top:2px}
+.vlist{margin-top:4px}
+.vlist .vi{display:flex; justify-content:space-between; padding:10px 2px; border-bottom:1px solid var(--border); font-size:13.5px}
+.vlist .vi:last-child{border:none}
+.call-link{display:inline-flex; align-items:center; gap:7px; color:var(--accent); font-weight:600; font-size:14px}
+.call-link svg{width:17px; height:17px}
+.banner{background:var(--warning-soft); color:var(--warning); border-radius:12px; padding:10px 13px;
+  font-size:12.5px; margin-bottom:14px; display:flex; gap:9px; align-items:flex-start}
+.banner svg{width:17px; height:17px; flex-shrink:0; margin-top:1px}
+
+/* ---------- Frosted glass refinement ---------- */
+:root{--glass:rgba(255,255,255,.6);--glass-2:rgba(255,255,255,.46);--glass-border:rgba(255,255,255,.72);--glass-hi:rgba(255,255,255,.6);--sheet-bg:rgba(250,249,246,.9);--blur:16px}
+html[data-theme="dark"]{--glass:rgba(30,35,40,.55);--glass-2:rgba(44,51,57,.46);--glass-border:rgba(255,255,255,.09);--glass-hi:rgba(255,255,255,.1);--sheet-bg:rgba(18,23,27,.9)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(125% 80% at 50% -10%,rgba(227,171,67,.16),transparent 55%),radial-gradient(90% 62% at 106% 108%,rgba(227,171,67,.08),transparent 55%)}
+.card,.stat,.entry,.cust,.fin-row,.rem,.search,.staff{
+  background:var(--glass);
+  backdrop-filter:blur(var(--blur)) saturate(1.2);-webkit-backdrop-filter:blur(var(--blur)) saturate(1.2);
+  border:1px solid var(--glass-border);
+  box-shadow:inset 0 1px 0 var(--glass-hi),0 6px 22px rgba(10,12,16,.1)}
+html[data-theme="dark"] .card,html[data-theme="dark"] .stat,html[data-theme="dark"] .entry,html[data-theme="dark"] .cust,html[data-theme="dark"] .fin-row,html[data-theme="dark"] .rem,html[data-theme="dark"] .search,html[data-theme="dark"] .staff{box-shadow:inset 0 1px 0 var(--glass-hi),0 10px 28px rgba(0,0,0,.36)}
+header.appbar{background:var(--glass);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);box-shadow:0 1px 0 var(--glass-border)}
+nav.bottom{background:var(--glass);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);box-shadow:inset 0 1px 0 var(--glass-hi)}
+nav.bottom button.active{background:var(--primary-soft)}
+.sheet{background:var(--sheet-bg);backdrop-filter:blur(30px) saturate(1.3);-webkit-backdrop-filter:blur(30px) saturate(1.3);border:1px solid var(--glass-border);border-bottom:none;box-shadow:inset 0 1px 0 var(--glass-hi),var(--shadow-3)}
+.sheet .sfoot{background:transparent;border-top:1px solid var(--glass-border)}
+.seg{background:var(--glass-2);border:1px solid var(--glass-border)}
+.ac{background:var(--sheet-bg);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3)}
+.field input,.field select,.field textarea{background:var(--glass-2)}
+.stat.hero{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 12px 30px rgba(0,0,0,.34)}
+.stat.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 130% at 100% 0,rgba(227,171,67,.18),transparent 55%)}
+.stat.hero>*{position:relative;z-index:1}
+/* ---------- Salary / staff ---------- */
+.staff{padding:14px 15px}
+.staff .srow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.staff .snm{font-weight:700;font-size:15.5px}
+.staff .ssal{font-family:var(--font-h);font-weight:700;font-size:15px}
+.staff .ssal span{font-size:11px;color:var(--text-3);font-weight:500;margin-left:1px}
+.staff .sstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.staff .sstats>div{background:var(--surface-2);border-radius:11px;padding:9px 6px;text-align:center}
+.staff .sstats .l{display:block;font-size:11px;color:var(--text-3);margin-bottom:3px}
+.staff .sstats .v{font-weight:700;font-size:14px}
+.staff .sact{display:flex;gap:8px}
+.staff .sact .btn{flex:1;padding:10px 6px;font-size:13px}
+.settle-btn{margin-top:6px;padding:5px 12px;border-radius:9px;background:var(--danger-soft);color:var(--danger);font-size:12px;font-weight:600;border:none}
+.spin{display:inline-block;width:15px;height:15px;margin-right:8px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.settle-btn.upi{background:var(--primary-soft);color:var(--accent);margin-right:6px}
+/* ---------- Auth / bootstrap screens ---------- */
+.authwrap{min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:32px 20px calc(32px + var(--safe-b)); max-width:420px; margin:0 auto}
+.authwrap .amark{font-family:var(--font-h); font-weight:700; font-size:26px; letter-spacing:.15em; text-transform:uppercase; margin-bottom:2px}
+.authwrap .amark span{color:var(--accent); margin-left:.32em}
+.authwrap .asub{font-size:11px; color:var(--text-3); letter-spacing:.24em; text-transform:uppercase; font-weight:600; margin-bottom:30px}
+.authcard{width:100%; background:var(--glass); backdrop-filter:blur(var(--blur)) saturate(1.2); -webkit-backdrop-filter:blur(var(--blur)) saturate(1.2);
+  border:1px solid var(--glass-border); border-radius:var(--r-lg); box-shadow:inset 0 1px 0 var(--glass-hi),0 6px 22px rgba(10,12,16,.1); padding:22px 20px}
+.authcard h2{font-size:19px; margin-bottom:4px}
+.authcard .adesc{font-size:13px; color:var(--text-2); margin-bottom:18px; line-height:1.5}
+.authtabs{display:flex; gap:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:4px; margin-bottom:18px}
+.authtabs button{flex:1; padding:9px 4px; border-radius:9px; font-weight:600; font-size:13px; color:var(--text-2)}
+.authtabs button.active{background:var(--surface); color:var(--accent); box-shadow:var(--shadow-1)}
+.autherr{background:var(--danger-soft); color:var(--danger); border-radius:11px; padding:10px 13px; font-size:12.5px; margin-bottom:14px; display:flex; gap:8px; align-items:flex-start}
+.autherr svg{width:16px; height:16px; flex-shrink:0; margin-top:1px}
+.authfoot{margin-top:18px; text-align:center; font-size:12px; color:var(--text-3); line-height:1.6}
+.loadwrap{min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; color:var(--text-2)}
+.loadwrap .spin-lg{width:30px; height:30px; border:3px solid var(--border-2); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite}
+.cfgpre{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:12px; font-family:monospace; font-size:11.5px; line-height:1.6; white-space:pre-wrap; word-break:break-all; color:var(--text-2); max-height:160px; overflow-y:auto}
+
+/* ---------- Queue status ---------- */
+.qseg{display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; padding-bottom:2px}
+.qseg button{flex-shrink:0; padding:8px 14px; border-radius:11px; background:var(--surface-2); border:1px solid var(--border);
+  font-weight:600; font-size:12.5px; color:var(--text-2); display:flex; align-items:center; gap:6px}
+.qseg button.active{background:var(--primary-soft); color:var(--accent); border-color:transparent}
+.qseg button .n{background:rgba(0,0,0,.08); border-radius:999px; padding:1px 7px; font-size:11px}
+html[data-theme="dark"] .qseg button .n{background:rgba(255,255,255,.12)}
+.qpill{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:700}
+.qpill.waiting{background:var(--warning-soft); color:var(--warning)}
+.qpill.washing{background:#e3edfd; color:var(--upi)}
+html[data-theme="dark"] .qpill.washing{background:#10233f}
+.qpill.done{background:var(--success-soft); color:var(--success)}
+.entry .qact{display:flex; gap:6px; margin-top:8px}
+.entry .qact button{padding:6px 11px; border-radius:9px; font-size:11.5px; font-weight:700; background:var(--surface-3); color:var(--text-2)}
+.entry .qact button.go{background:var(--primary); color:var(--on-primary)}
+.entry .qact button.wa{background:#dcf8e5; color:#1a8a3d}
+html[data-theme="dark"] .entry .qact button.wa{background:#0f2e1b; color:#4fd97e}
+.entry-wrap{display:flex; flex-direction:column}
+
+/* ---------- Catalog editor ---------- */
+.chiplist{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px}
+.chiplist .chip{display:flex; align-items:center; gap:7px; background:var(--surface-2); border:1px solid var(--border);
+  border-radius:999px; padding:7px 8px 7px 14px; font-size:13px; font-weight:600}
+.chiplist .chip button{width:20px; height:20px; border-radius:50%; background:var(--danger-soft); color:var(--danger);
+  display:grid; place-items:center; flex-shrink:0}
+.chiplist .chip button svg{width:12px; height:12px}
+.addchip{display:flex; gap:8px; margin-bottom:6px}
+.addchip input{flex:1; padding:11px 13px; border-radius:12px; border:1.5px solid var(--border); background:var(--surface-2); color:var(--text); outline:none}
+.addchip input:focus{border-color:var(--primary); background:var(--surface)}
+.addchip button{padding:0 16px; border-radius:12px; background:var(--primary); color:var(--on-primary); font-weight:700; font-size:14px; flex-shrink:0}
+.pricegrp{margin-bottom:10px; border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; background:var(--glass-2)}
+.pricegrp summary{list-style:none; cursor:pointer; padding:13px 14px; display:flex; align-items:center; justify-content:between; font-weight:700; font-size:14px}
+.pricegrp summary::-webkit-details-marker{display:none}
+.pricegrp summary .cnt{margin-left:auto; font-size:11.5px; font-weight:600; color:var(--text-3)}
+.pricegrp summary::before{content:"";width:8px; height:8px; border-right:2px solid var(--text-3); border-bottom:2px solid var(--text-3);
+  transform:rotate(-45deg); margin-right:10px; transition:transform .18s}
+.pricegrp[open] summary::before{transform:rotate(45deg)}
+.pricerow{display:flex; align-items:center; gap:10px; padding:10px 14px; border-top:1px solid var(--border)}
+.pricerow .sv{flex:1; font-size:13.5px}
+.pricerow input{width:96px; text-align:right; padding:9px 10px; font-size:14px; font-weight:600; border-radius:10px; border:1.5px solid var(--border); background:var(--surface-2); color:var(--text); outline:none}
+.pricerow input:focus{border-color:var(--primary); background:var(--surface)}
+
+/* ---------- Team ---------- */
+.teamrow{display:flex; align-items:center; gap:12px; padding:13px 14px; background:var(--glass);
+  border:1px solid var(--glass-border); border-radius:var(--r-md); box-shadow:var(--shadow-1); margin-bottom:9px}
+.teamrow .av{width:42px; height:42px; border-radius:50%; background:var(--primary-soft); color:var(--primary-deep);
+  display:grid; place-items:center; font-weight:700; font-size:15px; flex-shrink:0}
+html[data-theme="dark"] .teamrow .av{color:var(--primary)}
+.teamrow .mid{flex:1; min-width:0}
+.teamrow .nm{font-weight:600; font-size:14.5px}
+.teamrow .em{font-size:12px; color:var(--text-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.teamrow .rmv{color:var(--danger); font-size:12px; font-weight:700; padding:6px 10px}
+
+/* misc */
+.wtoggle{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:2px 0 14px}
+.switch{width:44px; height:26px; border-radius:999px; background:var(--surface-3); position:relative; flex-shrink:0; border:1px solid var(--border)}
+.switch .kn{position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:var(--surface); box-shadow:var(--shadow-1); transition:transform .18s}
+.switch.on{background:var(--primary)}
+.switch.on .kn{transform:translateX(18px); background:#fff}
+</style>
+
+</head>
+<body>
+
+<div id="loadScreen" class="loadwrap"><div class="spin-lg"></div><div>Loading Wipe Out&hellip;</div></div>
+
+<div id="setupScreen" class="authwrap" style="display:none">
+  <div class="amark">WIPE<span>OUT</span></div>
+  <div class="asub">Auto Spa &middot; Car Wash</div>
+  <div class="authcard">
+    <h2>Connect your Firebase project</h2>
+    <div class="adesc">Wipe Out runs fully online now. Paste the Firebase config from your project (Project settings &rarr; Your apps &rarr; Web app) to connect this device. You only do this once per device.</div>
+    <div id="setupErr"></div>
+    <div class="field"><label>Firebase config</label>
+      <textarea id="setupCfg" rows="7" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}'></textarea>
+      <div class="hint">Paste the whole firebaseConfig object, or just the JSON braces &#123; &#125; part.</div>
+    </div>
+    <button class="btn primary block" id="setupSave">Connect</button>
+    <div class="authfoot">Don&rsquo;t have a Firebase project yet? Ask Wipe Out for the setup steps once you&rsquo;re in, or see the included README.</div>
+  </div>
+</div>
+
+<div id="authScreen" class="authwrap" style="display:none">
+  <div class="amark">WIPE<span>OUT</span></div>
+  <div class="asub">Auto Spa &middot; Car Wash</div>
+  <div class="authcard">
+    <div class="authtabs" id="authTabs">
+      <button data-t="login" class="active">Log in</button>
+      <button data-t="signup">Create shop</button>
+    </div>
+    <div id="authBody"></div>
+  </div>
+  <div class="authfoot" id="authDeviceInfo"></div>
+</div>
+
+<div id="app" style="display:none">
+  <header class="appbar">
+    <div class="brand">
+      <div>
+        <div class="name">WIPE<span>OUT</span></div>
+        <div class="sub" id="brandSub">Auto Spa &middot; Car Wash</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="themeBtn" aria-label="Toggle theme"></button>
+    <button class="iconbtn" id="menuBtn" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="view active" id="view-today"></section>
+    <section class="view" id="view-insights"></section>
+    <section class="view" id="view-customers"></section>
+    <section class="view" id="view-finance"></section>
+    <section class="view" id="view-team"></section>
+  </main>
+
+  <button class="btn primary add-btn" id="addBtn" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    <span id="addBtnLabel">Add</span>
+  </button>
+
+  <nav class="bottom" id="nav"></nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="shead"><h2 id="sheetTitle"></h2>
+    <button class="iconbtn" id="sheetClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="sbody" id="sheetBody"></div>
+  <div class="sfoot" id="sheetFoot" style="display:none"></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script>
+"use strict";
+/* ====================================================================
+   WIPE OUT — online build. Firebase Auth + Firestore, no offline mode.
+   ==================================================================== */
+
+/* ---------------- Local device prefs (theme only — everything else lives in Firestore) ---------------- */
+const LK={cfg:"wo.fbconfig",theme:"wo.theme"};
+function localGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function localSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* ---------------- Helpers (dates, money, dom) ---------------- */
+const $=(s,r=document)=>r.querySelector(s);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const todayStr=()=>{const d=new Date();return ymd(d);};
+function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function parseYmd(s){const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d);}
+const inr=new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2,minimumFractionDigits:0});
+const money=n=>inr.format(n||0);
+function compact(n){n=n||0;if(n>=1e7)return"₹"+(n/1e7).toFixed(n%1e7?1:0)+"Cr";if(n>=1e5)return"₹"+(n/1e5).toFixed(n%1e5?1:0)+"L";if(n>=1e3)return"₹"+(n/1e3).toFixed(n>=1e4?0:1)+"k";return"₹"+Math.round(n);}
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function fmtDate(s){const d=parseYmd(s);return DOW[d.getDay()]+", "+d.getDate()+" "+MON[d.getMonth()];}
+function relDay(s){const t=todayStr();if(s===t)return"Today";const y=new Date();y.setDate(y.getDate()-1);if(s===ymd(y))return"Yesterday";return fmtDate(s);}
+function fmtTime(t){if(!t)return"";let[h,m]=t.split(":").map(Number);const ap=h<12?"AM":"PM";h=h%12||12;return h+":"+String(m).padStart(2,"0")+" "+ap;}
+function esc(s){return(s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function startOfWeek(d){const x=new Date(d);const day=x.getDay();x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x;}
+function toast(msg,kind){const t=$("#toast");if(!t)return;const ic=kind==="err"
+  ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16.5v.5" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg>'
+  :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+  t.innerHTML=ic+"<span>"+esc(msg)+"</span>";t.classList.add("show");
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600);}
+function haptic(){if(navigator.vibrate)navigator.vibrate(8);}
+
+/* Surface silent JS errors as a toast instead of a button that quietly does nothing */
+window.addEventListener("error",(ev)=>{try{toast("Something broke: "+(ev.message||"unknown error"),"err");}catch(e){}});
+window.addEventListener("unhandledrejection",(ev)=>{try{toast("Something broke: "+((ev.reason&&ev.reason.message)||ev.reason||"unknown error"),"err");}catch(e){}});
+
+/* ---------------- Firebase config parsing (pure, testable) ---------------- */
+function parseFirebaseConfig(text){
+  text=(text||"").trim();
+  if(!text)throw new Error("Paste your Firebase config first.");
+  const start=text.indexOf("{"), end=text.lastIndexOf("}");
+  if(start===-1||end===-1||end<start)throw new Error("Could not find a { ... } config object in the pasted text.");
+  const body=text.slice(start,end+1);
+  let obj;
+  try{ obj=JSON.parse(body); }
+  catch(e){
+    try{ obj=Function('"use strict";return ('+body+')')(); }
+    catch(e2){ throw new Error("That doesn't look like a valid Firebase config. Paste the exact firebaseConfig object from Project settings."); }
+  }
+  if(!obj||typeof obj!=="object")throw new Error("That doesn't look like a valid Firebase config.");
+  const required=["apiKey","authDomain","projectId","appId"];
+  const missing=required.filter(k=>!obj[k]);
+  if(missing.length)throw new Error("Missing "+missing.join(", ")+" in the pasted config.");
+  return obj;
+}
+
+/* ---------------- Catalog helpers (pure, testable) ---------------- */
+const DEFAULT_VEH=["Hatchback","Sedan","SUV / MUV","Bike","Auto","Truck / Bus","Other"];
+const DEFAULT_SERVICES=["Exterior Wash","Full Wash","Premium Spa","Interior Detail","Polish / Wax","Underbody","Other"];
+const DEFAULT_WA_TEMPLATE="Hi {name}, your {vehicle} ({plate}) wash is complete! Total {amount}. Thank you for choosing {shop}.";
+const PAY_INCOME=["Wash top-up","Tips","Other income"];
+const PAY_EXPENSE=["Salary","Advance","Supplies / Items","Equipment","Rent","Utilities","Maintenance","Other"];
+function defaultConfig(businessName){
+  return {
+    businessName:businessName||"Wipe Out",
+    vehicleTypes:DEFAULT_VEH.slice(), services:DEFAULT_SERVICES.slice(),
+    prices:{}, upiId:"", prToken:"", waTemplate:DEFAULT_WA_TEMPLATE,
+    waAutoPrompt:true, employeeLogins:[]
+  };
+}
+function priceKey(type,service){return (type||"")+"|"+(service||"");}
+function priceFor(cfg,type,service){
+  if(!type||!service)return null;
+  const v=(cfg&&cfg.prices)?cfg.prices[priceKey(type,service)]:undefined;
+  return (v===undefined||v===null||v==="")?null:Number(v);
+}
+function formatPlate(p){return (p||"").toUpperCase().replace(/[^A-Z0-9]/g,"");}
+
+/* ---------------- UPI ---------------- */
+function upiString(cfg,amount,note){
+  const pa=((cfg&&cfg.upiId)||"").trim();
+  const pn=((cfg&&cfg.businessName)||"Wipe Out").trim();
+  return "upi://pay?pa="+encodeURIComponent(pa)+"&pn="+encodeURIComponent(pn)+"&am="+encodeURIComponent(amount||0)+"&cu=INR"+(note?"&tn="+encodeURIComponent(note):"");
+}
+
+/* ---------------- WhatsApp ---------------- */
+function waApplyTemplate(tpl,e,cfg){
+  const t=tpl||DEFAULT_WA_TEMPLATE;
+  return t
+    .replace(/\{name\}/g,(e&&e.name)||"there")
+    .replace(/\{vehicle\}/g,(e&&(e.vehicleName||e.vehicleType))||"vehicle")
+    .replace(/\{plate\}/g,(e&&e.vehicleNumber)||"")
+    .replace(/\{amount\}/g,money(e&&e.amount))
+    .replace(/\{shop\}/g,(cfg&&cfg.businessName)||"Wipe Out");
+}
+function waLink(phone,message){
+  const digits=(phone||"").replace(/\D/g,"");
+  if(!digits)return null;
+  const withCC=digits.length===10?"91"+digits:digits;
+  return "https://wa.me/"+withCC+"?text="+encodeURIComponent(message||"");
+}
+
+/* ---------------- Vehicle icons ---------------- */
+function vehIconFor(t){
+  const I=p=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+  switch((t||"").toLowerCase()){
+    case "bike":return I('<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l3.5-6h4l2.5 4"/><path d="M9 11h5M5 11h2"/>');
+    case "auto":return I('<path d="M3 16v-3a6 6 0 0 1 6-6h2l4 5h2a2 2 0 0 1 2 2v2"/><path d="M2 16h20"/><circle cx="8" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/><path d="M9 7v9"/>');
+    case "truck / bus":return I('<rect x="2" y="7" width="12" height="9" rx="1"/><path d="M14 10h3l3 3v3h-6z"/><circle cx="6" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>');
+    case "suv / muv":return I('<path d="M3 12l1-4.4A2 2 0 0 1 6 6h10a2 2 0 0 1 2 1.6L19 12"/><path d="M2 12h20v4a1 1 0 0 1-1 1h-1.3M5.3 17H4a1 1 0 0 1-1-1v-4"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/><path d="M9.5 6v6M14 6v6"/>');
+    case "hatchback":return I('<path d="M4 12l2-4.4A2 2 0 0 1 8 6h5l5 6"/><path d="M2 12h20v4a1 1 0 0 1-1 1h-1.4M5.4 17H4a1 1 0 0 1-1-1v-4"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/>');
+    default:return I('<path d="M5 11l1.5-4.2A2 2 0 0 1 8.4 5.4h7.2a2 2 0 0 1 1.9 1.4L19 11"/><path d="M3 11h18v5a1 1 0 0 1-1 1h-1.5M5.5 17H4a1 1 0 0 1-1-1v-5"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/>');
+  }
+}
+
+/* ---------------- Payment status pill (Cash/UPI/Due/Partial) ---------------- */
+function entryStatus(e){if(e.due>0&&e.received>0)return"part";if(e.due>0)return"due";return e.mode==="UPI"?"upi":"cash";}
+function statusLabel(e){const s=entryStatus(e);return s==="part"?"Partial":s==="due"?"Due":s==="upi"?"UPI":"Cash";}
+
+/* ---------------- Queue status (Waiting -> Washing -> Done) ---------------- */
+const QUEUE_STATUSES=["waiting","washing","done"];
+function nextQueueStatus(s){const i=QUEUE_STATUSES.indexOf(s);return QUEUE_STATUSES[Math.min((i<0?0:i)+1,2)];}
+function queueMeta(s){return {waiting:{label:"Waiting",cls:"waiting"},washing:{label:"Washing",cls:"washing"},done:{label:"Done",cls:"done"}}[s]||{label:"Waiting",cls:"waiting"};}
+
+/* ---------------- Role gating ---------------- */
+function isEmployee(){return state.role==="employee";}
+const EMP_VIEWS=["today","customers"];
+
+/* ====================================================================
+   Firebase bootstrap
+   ==================================================================== */
+let fbConfig=null, app=null, auth=null, db=null;
+const state={uid:null,email:null,shopId:null,role:null,name:""};
+let config=defaultConfig();
+let entries=[], finance=[], customers=[], staff=[];
+let unsubs=[];
+
+function detachListeners(){unsubs.forEach(u=>{try{u();}catch(e){}});unsubs=[];}
+
+function shopCol(name){return db.collection("shops").doc(state.shopId).collection(name);}
+function configRef(){return db.collection("shops").doc(state.shopId).collection("settings").doc("config");}
+
+function attachListeners(){
+  detachListeners();
+  unsubs.push(configRef().onSnapshot(snap=>{
+    config=Object.assign(defaultConfig(),snap.exists?snap.data():{});
+    renderCurrent();
+  },()=>{}));
+  unsubs.push(shopCol("entries").onSnapshot(snap=>{
+    entries=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderCurrent();
+  },err=>toast("Sync error (washes): "+err.message,"err")));
+  unsubs.push(shopCol("customers").onSnapshot(snap=>{
+    customers=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderCurrent();
+  },err=>toast("Sync error (customers): "+err.message,"err")));
+  if(!isEmployee()){
+    unsubs.push(shopCol("finance").onSnapshot(snap=>{
+      finance=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderCurrent();
+    },err=>toast("Sync error (finance): "+err.message,"err")));
+    unsubs.push(shopCol("staff").onSnapshot(snap=>{
+      staff=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderCurrent();
+    },err=>toast("Sync error (staff): "+err.message,"err")));
+  }else{
+    finance=[];staff=[];
+  }
+}
+
+function initFirebase(cfg){
+  fbConfig=cfg;
+  app=firebase.initializeApp(cfg);
+  auth=firebase.auth();
+  db=firebase.firestore();
+  auth.onAuthStateChanged(onAuthChanged);
+}
+
+async function onAuthChanged(user){
+  if(!user){
+    detachListeners();
+    state.uid=null;state.shopId=null;state.role=null;
+    showAuthScreen();
+    return;
+  }
+  try{
+    const mdoc=await db.collection("memberships").doc(user.uid).get();
+    if(!mdoc.exists){
+      showAuthScreen("This login isn't linked to a shop yet. If you just created it, try again in a moment, or ask your shop owner to add you.");
+      return;
+    }
+    const m=mdoc.data();
+    state.uid=user.uid;state.email=user.email;state.shopId=m.shopId;state.role=m.role||"employee";state.name=m.name||user.email;
+    attachListeners();
+    showApp();
+  }catch(e){
+    showAuthScreen("Could not verify your account: "+e.message);
+  }
+}
+
+/* Owner sign-up: creates the shop, the membership, and default catalog.
+   Multi-tenant: this one Firebase project can host any number of shops, each fully
+   isolated. A new signup can only ever become owner of a brand-new shop keyed to
+   their own uid (enforced by firestore.rules) — never an existing one. */
+async function ownerSignup(name,shopName,email,password){
+  const cred=await auth.createUserWithEmailAndPassword(email,password);
+  const newUid=cred.user.uid;
+  const shopId=newUid;
+  await db.collection("memberships").doc(newUid).set({shopId,role:"owner",name,email,createdAt:Date.now()});
+  await db.collection("shops").doc(shopId).set({ownerName:name,businessName:shopName||name,createdAt:Date.now()});
+  await db.collection("shops").doc(shopId).collection("settings").doc("config").set(defaultConfig(shopName||name));
+}
+
+async function ownerLogin(email,password){
+  await auth.signInWithEmailAndPassword(email,password);
+}
+
+async function doSignOut(){
+  try{await auth.signOut();}catch(e){}
+}
+
+/* Owner creates an employee login without disturbing their own session (secondary app trick) */
+async function createEmployeeAccount(name,email,password){
+  const sec=firebase.initializeApp(fbConfig,"Secondary_"+Date.now()+"_"+Math.random().toString(36).slice(2,6));
+  try{
+    const cred=await sec.auth().createUserWithEmailAndPassword(email,password);
+    const newUid=cred.user.uid;
+    await db.collection("memberships").doc(newUid).set({shopId:state.shopId,role:"employee",name,email,createdAt:Date.now()});
+    await configRef().set({employeeLogins:firebase.firestore.FieldValue.arrayUnion({uid:newUid,name,email})},{merge:true});
+    return newUid;
+  }finally{
+    try{await sec.auth().signOut();}catch(e){}
+    try{await sec.delete();}catch(e){}
+  }
+}
+async function removeEmployeeAccess(login){
+  await db.collection("memberships").doc(login.uid).delete().catch(()=>{});
+  await configRef().set({employeeLogins:firebase.firestore.FieldValue.arrayRemove(login)},{merge:true});
+}
+
+/* ====================================================================
+   Screen switching
+   ==================================================================== */
+function showLoading(){
+  $("#loadScreen").style.display="flex";
+  $("#setupScreen").style.display="none";
+  $("#authScreen").style.display="none";
+  $("#app").style.display="none";
+}
+function showSetupScreen(err){
+  $("#loadScreen").style.display="none";
+  $("#setupScreen").style.display="flex";
+  $("#authScreen").style.display="none";
+  $("#app").style.display="none";
+  const e=$("#setupErr");
+  e.innerHTML=err?'<div class="autherr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16.5v.5" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg><div>'+esc(err)+'</div></div>':"";
+}
+function showAuthScreen(err){
+  $("#loadScreen").style.display="none";
+  $("#setupScreen").style.display="none";
+  $("#authScreen").style.display="flex";
+  $("#app").style.display="none";
+  renderAuthTab(authTab,err);
+  const di=$("#authDeviceInfo");
+  if(di)di.innerHTML='Connected to <b>'+esc((fbConfig&&fbConfig.projectId)||"")+'</b> &middot; <a href="#" id="resetFbLink" style="color:var(--accent);font-weight:600">Use a different Firebase project</a>';
+  const rl=$("#resetFbLink");
+  if(rl)rl.onclick=(ev)=>{ev.preventDefault();if(confirm("Disconnect this device from Firebase and set up a different project?")){localStorage.removeItem(LK.cfg);location.reload();}};
+}
+let authTab="login";
+function renderAuthTab(tab,err){
+  authTab=tab;
+  $("#authTabs").querySelectorAll("[data-t]").forEach(b=>b.classList.toggle("active",b.dataset.t===tab));
+  const body=$("#authBody");
+  const errHtml=err?'<div class="autherr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16.5v.5" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg><div>'+esc(err)+'</div></div>':"";
+  if(tab==="login"){
+    body.innerHTML=`
+      ${errHtml}
+      <div class="field"><label>Email</label><input id="loEmail" type="email" inputmode="email" autocomplete="username" placeholder="you@shop.com"></div>
+      <div class="field"><label>Password</label><input id="loPass" type="password" autocomplete="current-password" placeholder="Password"></div>
+      <button class="btn primary block" id="loSubmit">Log in</button>
+    `;
+    $("#loSubmit").onclick=async()=>{
+      const email=$("#loEmail").value.trim(),pass=$("#loPass").value;
+      if(!email||!pass){renderAuthTab("login","Enter your email and password.");return;}
+      const btn=$("#loSubmit");const orig=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spin"></span>Logging in...';
+      try{await ownerLogin(email,pass);}
+      catch(e){renderAuthTab("login",authErrMsg(e));}
+      finally{if(document.body.contains(btn)){btn.disabled=false;btn.textContent=orig;}}
+    };
+  }else{
+    body.innerHTML=`
+      ${errHtml}
+      <div class="field"><label>Your name</label><input id="suName" placeholder="Owner name"></div>
+      <div class="field"><label>Shop name</label><input id="suShop" placeholder="Wipe Out Auto Spa"></div>
+      <div class="field"><label>Email</label><input id="suEmail" type="email" inputmode="email" autocomplete="username" placeholder="you@shop.com"></div>
+      <div class="field"><label>Password</label><input id="suPass" type="password" autocomplete="new-password" placeholder="At least 6 characters"></div>
+      <button class="btn primary block" id="suSubmit">Create shop</button>
+      <div class="hint" style="margin-top:10px">This creates your owner account. You can add employee logins later from Settings.</div>
+    `;
+    $("#suSubmit").onclick=async()=>{
+      const name=$("#suName").value.trim(),shop=$("#suShop").value.trim(),email=$("#suEmail").value.trim(),pass=$("#suPass").value;
+      if(!name||!email||!pass){renderAuthTab("signup","Fill in your name, email and a password.");return;}
+      if(pass.length<6){renderAuthTab("signup","Password should be at least 6 characters.");return;}
+      const btn=$("#suSubmit");const orig=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spin"></span>Creating shop...';
+      try{await ownerSignup(name,shop,email,pass);}
+      catch(e){renderAuthTab("signup",authErrMsg(e));}
+      finally{if(document.body.contains(btn)){btn.disabled=false;btn.textContent=orig;}}
+    };
+  }
+}
+function authErrMsg(e){
+  const c=e&&e.code||"";
+  if(c==="auth/email-already-in-use")return"That email is already registered. Try logging in instead.";
+  if(c==="auth/invalid-email")return"That email address doesn't look right.";
+  if(c==="auth/weak-password")return"Password should be at least 6 characters.";
+  if(c==="auth/wrong-password"||c==="auth/invalid-credential")return"Wrong email or password.";
+  if(c==="auth/user-not-found")return"No account found with that email.";
+  if(c==="auth/network-request-failed")return"Network error, check your connection.";
+  return e&&e.message||"Something went wrong.";
+}
+$("#authTabs").querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>renderAuthTab(b.dataset.t));
+
+function showApp(){
+  $("#loadScreen").style.display="none";
+  $("#setupScreen").style.display="none";
+  $("#authScreen").style.display="none";
+  $("#app").style.display="block";
+  $("#brandSub").textContent=(config.businessName||"Wipe Out")+(isEmployee()?" · Staff":" · Owner");
+  buildNav();
+  go(isEmployee()?"today":(current||"today"));
+}
+
+/* ====================================================================
+   Boot: built-in Firebase config (baked in below), local override, or ask for one
+   ==================================================================== */
+const BUILTIN_FIREBASE_CONFIG={
+  apiKey:"AIzaSyAAZCIMEyzIDtJGoCBBZjQcBidfcFMwf7U",
+  authDomain:"wipeoutcar-232f5.firebaseapp.com",
+  projectId:"wipeoutcar-232f5",
+  storageBucket:"wipeoutcar-232f5.firebasestorage.app",
+  messagingSenderId:"1043330741706",
+  appId:"1:1043330741706:web:6c67900cb0c1505b7e4b33"
+};
+const BUILTIN_PR_TOKEN="6e531ec041f64580582bca34414dc2abc6b03a7e";
+function bootWipeOut(){
+  const saved=localGet(LK.cfg,null)||BUILTIN_FIREBASE_CONFIG;
+  applyTheme(localGet(LK.theme,null));
+  if(saved){
+    try{ initFirebase(saved); showLoading(); }
+    catch(e){ showSetupScreen("Could not connect: "+e.message); }
+  }else{
+    showSetupScreen();
+  }
+}
+$("#setupSave").onclick=()=>{
+  try{
+    const cfg=parseFirebaseConfig($("#setupCfg").value);
+    localSet(LK.cfg,cfg);
+    initFirebase(cfg);
+    showLoading();
+  }catch(e){
+    showSetupScreen(e.message);
+  }
+};
+/* ============================ Charts ============================ */
+function barChart(data,opts={}){
+  // data: [{label, value}]
+  const W=opts.w||520,H=opts.h||168,padB=26,padT=16,padL=4,padR=4;
+  const max=Math.max(1,...data.map(d=>d.value));
+  const n=data.length, gap=n>9?4:8;
+  const bw=(W-padL-padR-gap*(n-1))/n;
+  const chH=H-padB-padT;
+  let bars="",labels="",vals="";
+  data.forEach((d,i)=>{
+    const x=padL+i*(bw+gap);
+    const h=Math.max(d.value>0?3:0, chH*(d.value/max));
+    const y=padT+chH-h;
+    const hl=opts.highlight===i;
+    bars+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="${Math.min(6,bw/2).toFixed(1)}" fill="${hl?'var(--primary)':'var(--accent)'}" opacity="${d.value>0?1:.25}"/>`;
+    labels+=`<text x="${(x+bw/2).toFixed(1)}" y="${H-9}" text-anchor="middle" font-size="${n>9?9:10}" fill="var(--text-3)" font-family="var(--font-b)">${esc(d.label)}</text>`;
+    if(d.value>0&&n<=12)vals+=`<text x="${(x+bw/2).toFixed(1)}" y="${(y-5).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="var(--text-2)" font-weight="600" font-family="var(--font-b)">${compact(d.value).replace('₹','')}</text>`;
+  });
+  return `<svg class="bars" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Bar chart">${bars}${vals}${labels}</svg>`;
+}
+function donut(segs,opts={}){
+  const total=segs.reduce((s,x)=>s+x.value,0);
+  const R=46,sw=15,C=2*Math.PI*R,cx=58,cy=58;
+  let off=0,arcs="";
+  if(total>0){segs.forEach(s=>{const frac=s.value/total;const len=frac*C;
+    arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${s.color}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>`;
+    off+=len;});}
+  else arcs=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--surface-3)" stroke-width="${sw}"/>`;
+  const center=opts.center||compact(total);
+  const svg=`<svg width="116" height="116" viewBox="0 0 116 116" role="img" aria-label="Payment split">${arcs}
+    <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="16" font-weight="700" fill="var(--text)" font-family="var(--font-h)">${center}</text>
+    <text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9.5" fill="var(--text-3)" font-family="var(--font-b)">${opts.sub||'collected'}</text></svg>`;
+  const legend=`<div class="legend">${segs.map(s=>`<div class="lg"><span class="sw" style="background:${s.color}"></span>${esc(s.label)}<span class="v">${money(s.value)}</span></div>`).join("")}</div>`;
+  return `<div class="donut-wrap">${svg}${legend}</div>`;
+}
+
+/* ============================ INSIGHTS view ============================ */
+let insPeriod="week", insOffset=0;
+function periodRange(){
+  const base=new Date();base.setHours(0,0,0,0);
+  if(insPeriod==="day"){base.setDate(base.getDate()+insOffset);return{from:ymd(base),to:ymd(base),label:relDay(ymd(base))};}
+  if(insPeriod==="week"){const s=startOfWeek(base);s.setDate(s.getDate()+insOffset*7);const e=new Date(s);e.setDate(e.getDate()+6);
+    return{from:ymd(s),to:ymd(e),label:s.getDate()+" "+MON[s.getMonth()]+" - "+e.getDate()+" "+MON[e.getMonth()]};}
+  if(insPeriod==="month"){const d=new Date(base.getFullYear(),base.getMonth()+insOffset,1);const e=new Date(d.getFullYear(),d.getMonth()+1,0);
+    return{from:ymd(d),to:ymd(e),label:MON[d.getMonth()]+" "+d.getFullYear()};}
+  const y=base.getFullYear()+insOffset;return{from:y+"-01-01",to:y+"-12-31",label:String(y)};
+}
+function insBars(range){
+  if(insPeriod==="day"||insPeriod==="week"){
+    // 7 day bars of the week containing the range
+    const start=insPeriod==="week"?parseYmd(range.from):startOfWeek(parseYmd(range.from));
+    const arr=[];for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);const k=ymd(d);
+      arr.push({label:DOW[d.getDay()],value:sumDay(k),key:k});}return arr;
+  }
+  if(insPeriod==="month"){
+    const d=parseYmd(range.from);const days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();const arr=[];
+    for(let i=1;i<=days;i++){const k=ymd(new Date(d.getFullYear(),d.getMonth(),i));
+      arr.push({label:(i%5===0||i===1)?String(i):"",value:sumDay(k)});}return arr;
+  }
+  const y=Number(range.from.slice(0,4));const arr=[];
+  for(let m=0;m<12;m++){const f=ymd(new Date(y,m,1)),t=ymd(new Date(y,m+1,0));arr.push({label:MON[m][0],value:sumRange(f,t)});}return arr;
+}
+function sumDay(k){return entries.filter(e=>e.date===k).reduce((s,e)=>s+(e.received||0),0);}
+function sumRange(f,t){return entries.filter(e=>e.date>=f&&e.date<=t).reduce((s,e)=>s+(e.received||0),0);}
+function renderInsights(){
+  const v=$("#view-insights");
+  const r=periodRange();
+  const sub=entries.filter(e=>e.date>=r.from&&e.date<=r.to);
+  const collected=sub.reduce((s,e)=>s+(e.received||0),0);
+  const cash=sub.filter(e=>e.mode==="Cash").reduce((s,e)=>s+(e.received||0),0);
+  const upi=sub.filter(e=>e.mode==="UPI").reduce((s,e)=>s+(e.received||0),0);
+  const due=sub.reduce((s,e)=>s+(e.due||0),0);
+  const washes=sub.length;
+  const avg=washes?collected/washes:0;
+  const bars=insBars(r);
+  const titles={day:"Today",week:"This Week",month:"This Month",year:"This Year"};
+  const barCap={day:"Daily collections this week",week:"Daily collections",month:"Daily collections this month",year:"Monthly collections this year"};
+  v.innerHTML=`
+    <div class="seg" id="insSeg">
+      ${["day","week","month","year"].map(p=>`<button data-p="${p}" class="${insPeriod===p?"active":""}">${{day:"Day",week:"Week",month:"Month",year:"Year"}[p]}</button>`).join("")}
+    </div>
+    <div class="period-nav">
+      <div class="label">${esc(r.label)}</div>
+      <div class="navbtns">
+        <button id="iPrev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button id="iNext" aria-label="Next" ${insOffset>=0?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat hero"><div class="lbl">Total collected</div><div class="val num">${money(collected)}</div></div>
+      <div class="stat"><div class="lbl">Washes</div><div class="val sm num">${washes}</div></div>
+      <div class="stat"><div class="lbl">Avg / wash</div><div class="val sm num">${money(avg)}</div></div>
+      ${due>0?`<div class="stat accent-red" style="grid-column:1/-1"><div class="lbl">Outstanding due</div><div class="val sm num">${money(due)}</div></div>`:""}
+    </div>
+    <div class="card chart-card" style="margin-top:16px">
+      <h3>Collections</h3><div class="cap">${barCap[insPeriod]}</div>
+      ${barChart(bars,{w:520,h:172})}
+    </div>
+    <div class="card chart-card" style="margin-top:14px">
+      <h3>Payment split</h3><div class="cap">How ${titles[insPeriod].toLowerCase()} was collected</div>
+      ${donut([{label:"Cash",value:cash,color:"var(--cash)"},{label:"UPI",value:upi,color:"var(--upi)"},{label:"Due (pending)",value:due,color:"var(--due)"}],{center:compact(collected)})}
+    </div>
+  `;
+  v.querySelectorAll("#insSeg [data-p]").forEach(b=>b.onclick=()=>{insPeriod=b.dataset.p;insOffset=0;renderInsights();});
+  $("#iPrev").onclick=()=>{insOffset--;renderInsights();};
+  $("#iNext").onclick=()=>{if(insOffset<0){insOffset++;renderInsights();}};
+}
+
+
+/* ============================ TODAY view (wash queue) ============================ */
+let todayDate=todayStr();
+let queueFilter="all";
+function renderToday(){
+  const v=$("#view-today");
+  if(!v)return;
+  const list=entries.filter(e=>e.date===todayDate).sort((a,b)=>(b.time||"").localeCompare(a.time||""));
+  const collected=list.reduce((s,e)=>s+(e.received||0),0);
+  const cash=list.filter(e=>e.mode==="Cash").reduce((s,e)=>s+(e.received||0),0);
+  const upi=list.filter(e=>e.mode==="UPI").reduce((s,e)=>s+(e.received||0),0);
+  const due=list.reduce((s,e)=>s+(e.due||0),0);
+  const counts={all:list.length,waiting:0,washing:0,done:0};
+  list.forEach(e=>{const s=e.status||"waiting";if(counts[s]!=null)counts[s]++;});
+  const shown=queueFilter==="all"?list:list.filter(e=>(e.status||"waiting")===queueFilter);
+  const canNext=todayDate<todayStr();
+  v.innerHTML=`
+    <div class="period-nav">
+      <div class="label">${relDay(todayDate)}</div>
+      <div class="navbtns">
+        <button id="tPrev" aria-label="Previous day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button id="tToday" aria-label="Jump to today" style="width:auto;padding:0 12px;font-size:13px;font-weight:600;color:var(--accent)">Today</button>
+        <button id="tNext" aria-label="Next day" ${canNext?"":"disabled"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat hero"><div class="lbl">Collected ${list.length?"· "+list.length+" washes":""}</div><div class="val num">${money(collected)}</div></div>
+      <div class="stat accent-green"><div class="lbl">Cash</div><div class="val sm num">${money(cash)}</div></div>
+      <div class="stat accent-blue"><div class="lbl">UPI</div><div class="val sm num">${money(upi)}</div></div>
+      ${due>0?`<div class="stat accent-red" style="grid-column:1/-1"><div class="lbl">Outstanding due today</div><div class="val sm num">${money(due)}</div></div>`:""}
+    </div>
+    <div class="section-title">Queue</div>
+    <div class="qseg" id="qSeg">
+      ${[["all","All"],["waiting","Waiting"],["washing","Washing"],["done","Done"]].map(([k,l])=>`<button data-q="${k}" class="${queueFilter===k?"active":""}">${l}<span class="n">${counts[k]}</span></button>`).join("")}
+    </div>
+    <div id="todayList">${shown.length?shown.map(entryCard).join(""):emptyState(queueFilter==="all"?"No washes logged for this day.":"Nothing in "+queueFilter+".","Tap Add wash to start.")}</div>
+  `;
+  $("#tPrev").onclick=()=>{const d=parseYmd(todayDate);d.setDate(d.getDate()-1);todayDate=ymd(d);renderToday();};
+  $("#tNext").onclick=()=>{if(!canNext)return;const d=parseYmd(todayDate);d.setDate(d.getDate()+1);todayDate=ymd(d);renderToday();};
+  $("#tToday").onclick=()=>{todayDate=todayStr();renderToday();};
+  $("#qSeg").querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{queueFilter=b.dataset.q;renderToday();});
+  v.querySelectorAll("[data-edit]").forEach(el=>el.onclick=()=>openWashForm(el.dataset.edit));
+  v.querySelectorAll("[data-adv]").forEach(el=>el.addEventListener("click",ev=>{ev.stopPropagation();advanceQueue(el.dataset.adv);}));
+  v.querySelectorAll("[data-wa]").forEach(el=>el.addEventListener("click",ev=>{ev.stopPropagation();sendWhatsApp(el.dataset.wa);}));
+}
+function entryCard(e){
+  const st=entryStatus(e);
+  const qs=e.status||"waiting";
+  const qm=queueMeta(qs);
+  const sub=[e.vehicleName,e.name||"Walk-in",e.service||e.vehicleType].filter(Boolean).join(" · ");
+  const nextLabel={waiting:"Start wash",washing:"Mark done"}[qs];
+  return `<div class="entry-wrap">
+  <div class="entry" data-edit="${e.id}">
+    <div class="veh">${vehIconFor(e.vehicleType)}</div>
+    <div class="mid">
+      <div class="top"><span class="plate">${esc(e.vehicleNumber||"No plate")}</span><span class="pill ${st==='upi'?'upi':st==='due'?'due':st==='part'?'part':'cash'}">${statusLabel(e)}</span><span class="qpill ${qm.cls}">${qm.label}</span></div>
+      <div class="owner">${esc(sub)}${e.time?'  ·  '+esc(fmtTime(e.time)):""}</div>
+      <div class="qact">
+        ${nextLabel?`<button class="go" data-adv="${e.id}">${nextLabel}</button>`:""}
+        ${e.phone?`<button class="wa" data-wa="${e.id}"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="margin-right:4px;vertical-align:-2px"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .9.9-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.1.2-.3.2-.6.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4a.5.5 0 0 0 0-.5c-.1-.1-.6-1.4-.8-2-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.6 1.1 2.8.1.2 2 3 4.7 4.2a15.6 15.6 0 0 0 1.6.6 3.8 3.8 0 0 0 1.7.1c.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></svg>Message</button>`:""}
+      </div>
+    </div>
+    <div class="amt"><div class="big num">${money(e.amount)}</div>${e.due>0?`<div class="due num">${money(e.due)} due</div>`:""}</div>
+  </div>
+  </div>`;
+}
+function emptyState(t,s){return `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l1.5-4.2A2 2 0 0 1 8.4 5.4h7.2a2 2 0 0 1 1.9 1.4L19 11"/><path d="M3 11h18v5h-3M8 16H3v-5"/><circle cx="7" cy="16" r="1.5"/><circle cx="17" cy="16" r="1.5"/></svg><p><b>${esc(t)}</b></p><p>${esc(s)}</p></div>`;}
+
+async function advanceQueue(id){
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  const ns=nextQueueStatus(e.status||"waiting");
+  try{
+    await shopCol("entries").doc(id).update({status:ns,statusUpdatedAt:Date.now()});
+    haptic();
+    if(ns==="done"&&e.phone&&config.waAutoPrompt!==false){
+      promptWhatsApp(id);
+    }else{
+      toast(ns==="washing"?"Wash started":"Wash marked done");
+    }
+  }catch(err){toast("Could not update: "+err.message,"err");}
+}
+function sendWhatsApp(id){
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  const msg=waApplyTemplate(config.waTemplate,e,config);
+  const link=waLink(e.phone,msg);
+  if(!link){toast("No phone number on this wash","err");return;}
+  window.open(link,"_blank");
+}
+function promptWhatsApp(id){
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  openSheet("Wash done",`
+    <div style="text-align:center;padding:6px 0 4px">
+      <div style="font-size:15px;margin-bottom:4px">${esc(e.name||"Customer")}'s ${esc(e.vehicleName||e.vehicleType||"vehicle")} is ready.</div>
+      <div class="muted" style="font-size:13px">Send a WhatsApp update to ${esc(e.phone)}?</div>
+    </div>
+  `,[{label:"Skip",cls:"ghost",fn:closeSheet},{label:"Send WhatsApp",cls:"primary",fn:()=>{closeSheet();sendWhatsApp(id);}}]);
+}
+
+/* ============================ Customer index (pure, unchanged) ============================ */
+function buildCustomers(){
+  const map={};
+  for(const m of customers){
+    const key=(m.phone||"").trim()||("name:"+(m.name||"").trim().toLowerCase());
+    if(!key||key==="name:")continue;
+    map[key]={key,phone:m.phone||"",name:m.name||"",vehicles:Object.assign({},m.vehicles||{}),vehicleNames:Object.assign({},m.vehicleNames||{}),visits:0,spent:0,due:0,first:null,last:null,manual:true,notes:m.notes||"",nextWash:m.nextWash||""};
+  }
+  for(const e of entries){
+    const key=(e.phone||"").trim()||("name:"+(e.name||"").trim().toLowerCase());
+    if(!key||key==="name:")continue;
+    if(!map[key])map[key]={key,phone:e.phone||"",name:e.name||"",vehicles:{},vehicleNames:{},visits:0,spent:0,due:0,first:e.date,last:e.date,nextWash:""};
+    const c=map[key];
+    if(!c.name&&e.name)c.name=e.name;
+    if(!c.phone&&e.phone)c.phone=e.phone;
+    if(e.vehicleNumber){const vn=e.vehicleNumber.toUpperCase();c.vehicles[vn]=e.vehicleType||c.vehicles[vn]||"";c.vehicleNames=c.vehicleNames||{};if(e.vehicleName)c.vehicleNames[vn]=e.vehicleName;}
+    c.visits++; c.spent+=(e.received||0); c.due+=(e.due||0);
+    if(!c.first||e.date<c.first)c.first=e.date; if(!c.last||e.date>c.last)c.last=e.date;
+  }
+  return Object.values(map).sort((a,b)=>(b.last||"").localeCompare(a.last||""));
+}
+function buildVehicleIndex(){
+  const seen={},out=[];
+  for(const c of buildCustomers()){
+    for(const vn of Object.keys(c.vehicles)){
+      if(seen[vn])continue;seen[vn]=1;
+      out.push({number:vn,name:c.name,phone:c.phone,type:c.vehicles[vn],vname:(c.vehicleNames&&c.vehicleNames[vn])||""});
+    }
+  }
+  return out.sort((a,b)=>a.number.localeCompare(b.number));
+}
+function filterVehicles(index,q){
+  q=(q||"").trim().toUpperCase();
+  if(!q)return index.slice(0,7);
+  return index.filter(s=>s.number.includes(q))
+    .sort((a,b)=>((a.number.startsWith(q)?0:1)-(b.number.startsWith(q)?0:1))||a.number.localeCompare(b.number))
+    .slice(0,7);
+}
+function vehicleSuggestions(q){return filterVehicles(buildVehicleIndex(),q);}
+function customerEntries(c){
+  return entries.filter(e=>{const key=(e.phone||"").trim()||("name:"+(e.name||"").trim().toLowerCase());return key===c.key;})
+    .sort((a,b)=>b.date.localeCompare(a.date)||(b.time||"").localeCompare(a.time||""));
+}
+function autoDueReminders(){
+  const map={};
+  entries.filter(e=>e.due>0).forEach(e=>{
+    const key=(e.phone||"").trim()||("name:"+(e.name||"").trim().toLowerCase())||e.id;
+    if(!map[key])map[key]={name:e.name||"Walk-in",phone:e.phone||"",amount:0,last:e.date,key};
+    map[key].amount+=e.due;if(e.date>map[key].last)map[key].last=e.date;
+  });
+  return Object.values(map).sort((a,b)=>b.amount-a.amount);
+}
+
+/* ============================ CUSTOMERS view ============================ */
+let custQuery="";
+function renderCustomers(){
+  const v=$("#view-customers");if(!v)return;
+  let list=buildCustomers();
+  const q=custQuery.trim().toLowerCase();
+  if(q)list=list.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q)||Object.keys(c.vehicles).some(vn=>vn.toLowerCase().includes(q)));
+  const dues=autoDueReminders();
+  const totalDue=dues.reduce((s,d)=>s+d.amount,0);
+  v.innerHTML=`
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4" stroke-linecap="round"/></svg>
+      <input id="custSearch" placeholder="Search name, phone or vehicle" value="${esc(custQuery)}" inputmode="search">
+    </div>
+    ${dues.length&&!q?`<div class="section-title">Dues to follow up <span style="margin-left:auto;color:var(--danger);font-weight:700;text-transform:none;letter-spacing:0">${money(totalDue)}</span></div>
+      <div>${dues.slice(0,6).map(d=>`<div class="rem">
+        <div class="mid"><div class="t">${esc(d.name)}${d.phone?'  ·  <a class="call-link" href="tel:'+esc(d.phone)+'" style="font-size:13px">Call</a>':""}</div>
+        <div class="sub">Last visit ${esc(relDay(d.last))}</div></div>
+        <div style="text-align:right;flex-shrink:0"><div class="amt num" style="font-weight:700;color:var(--danger)">${money(d.amount)}</div>
+          <button class="settle-btn upi" data-collect="${esc(d.key)}" data-amt="${d.amount}" data-name="${esc(d.name)}">Collect</button>
+          <button class="settle-btn" data-settle="${esc(d.key)}">Mark paid</button></div></div>`).join("")}</div>`:""}
+    <div class="section-title">${q?list.length+" result"+(list.length!==1?"s":""):buildCustomers().length+" customers"}</div>
+    <div>${list.length?list.map(custCard).join(""):emptyState(q?"No matches found.":"No customers yet.",q?"Try a different search.":"Customers appear here once you log washes with a name or phone.")}</div>
+  `;
+  const si=$("#custSearch");
+  si.oninput=()=>{custQuery=si.value;const pos=si.selectionStart;renderCustomers();const ns=$("#custSearch");ns.focus();ns.setSelectionRange(pos,pos);};
+  v.querySelectorAll("[data-cust]").forEach(el=>el.onclick=()=>openCustomer(el.dataset.cust));
+  v.querySelectorAll("[data-settle]").forEach(el=>el.onclick=()=>{if(confirm("Mark all pending dues for this customer as received?"))settleCustomerDues(el.dataset.settle);});
+  v.querySelectorAll("[data-collect]").forEach(el=>el.onclick=()=>openUpiPay(parseFloat(el.dataset.amt)||0,el.dataset.name,()=>settleCustomerDues(el.dataset.collect)));
+}
+function custCard(c){
+  const initials=(c.name||"?").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"?";
+  const veh=Object.keys(c.vehicles);
+  return `<div class="cust" data-cust="${esc(c.key)}">
+    <div class="av">${esc(initials)}</div>
+    <div class="mid">
+      <div class="nm">${esc(c.name||"Unnamed")}</div>
+      <div class="meta">${c.phone?esc(c.phone):"No phone"}${veh.length?" · "+esc(veh.slice(0,2).join(", "))+(veh.length>2?" +"+(veh.length-2):""):""}</div>
+    </div>
+    <div class="stat-r">
+      <div class="sp num">${compact(c.spent)}</div>
+      <div class="vs">${c.visits} visit${c.visits!==1?"s":""}${c.due>0?' · <span style="color:var(--danger)">'+compact(c.due)+" due</span>":""}</div>
+    </div>
+  </div>`;
+}
+function openCustomer(key){
+  const c=buildCustomers().find(x=>x.key===key);if(!c)return;
+  const hist=customerEntries(c);
+  const veh=Object.entries(c.vehicles);
+  openSheet("Customer",`
+    <div class="row" style="gap:14px;margin-bottom:6px">
+      <div class="av" style="width:54px;height:54px;border-radius:50%;background:var(--primary-soft);color:var(--primary-deep);display:grid;place-items:center;font-weight:700;font-size:20px;font-family:var(--font-h)">${esc((c.name||"?").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"?")}</div>
+      <div style="flex:1">
+        <div style="font-family:var(--font-h);font-weight:700;font-size:18px">${esc(c.name||"Unnamed")}</div>
+        ${c.phone?`<a class="call-link" href="tel:${esc(c.phone)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L19 18l-1 3a16 16 0 0 1-14-14Z" stroke-linejoin="round"/></svg>${esc(c.phone)}</a>`:'<span class="muted" style="font-size:13px">No phone on file</span>'}
+      </div>
+    </div>
+    <div class="detail-stat">
+      <div class="ds"><div class="v num">${c.visits}</div><div class="l">Visits</div></div>
+      <div class="ds"><div class="v num">${compact(c.spent)}</div><div class="l">Spent</div></div>
+      <div class="ds"><div class="v num" style="color:${c.due>0?'var(--danger)':'inherit'}">${compact(c.due)}</div><div class="l">Due</div></div>
+    </div>
+    ${veh.length?`<div class="section-title" style="margin-top:8px">Vehicles</div><div style="display:flex;gap:7px;flex-wrap:wrap">${veh.map(([vn,t])=>`<span class="pill type">${esc(vn)}${c.vehicleNames&&c.vehicleNames[vn]?" "+esc(c.vehicleNames[vn]):""}${t?" · "+esc(t):""}</span>`).join("")}</div>`:""}
+    <div class="field" style="margin-top:18px">
+      <label>Next wash reminder</label>
+      <input type="date" id="cNext" value="${esc(c.nextWash||"")}">
+      <div class="hint">Set a date to remember when this customer is due for their next wash.</div>
+    </div>
+    <div class="section-title">Visit history</div>
+    <div class="vlist">${hist.slice(0,30).map(e=>`<div class="vi"><span>${esc(relDay(e.date))} · ${esc(e.vehicleNumber||e.service||e.vehicleType||"Wash")}</span><span class="num" style="font-weight:600">${money(e.amount)}${e.due>0?' <span style="color:var(--danger)">('+money(e.due)+" due)</span>":""}</span></div>`).join("")||'<div class="muted" style="font-size:13px;padding:8px 2px">No visits.</div>'}</div>
+  `,[{label:"Edit details",cls:"ghost",fn:()=>{closeSheet();openCustomerForm(c.key);}},
+    {label:"Save",cls:"primary",fn:async()=>{
+      const nx=$("#cNext").value;
+      try{
+        await db.collection("shops").doc(state.shopId).collection("customers").doc(c.key).set({key:c.key,name:c.name,phone:c.phone,nextWash:nx},{merge:true});
+        closeSheet();toast("Customer updated");
+      }catch(e){toast("Could not save: "+e.message,"err");}
+    }}]);
+}
+function openCustomerForm(key){
+  const existing=customers.find(c=>c.key===key);
+  let pre=existing;
+  if(!pre&&key){const c=buildCustomers().find(x=>x.key===key);if(c){pre={name:c.name,phone:c.phone,vehicles:c.vehicles,vehicleNames:c.vehicleNames,notes:c.notes||""};}}
+  const d=pre||{name:"",phone:"",vehicles:{},notes:""};
+  const vn0=Object.keys(d.vehicles||{})[0]||"";
+  const vt0=vn0?(d.vehicles[vn0]||""):"";
+  const vnm0=(d.vehicleNames&&vn0)?(d.vehicleNames[vn0]||""):"";
+  openSheet(key?"Edit customer":"Add customer",`
+    <div class="f2">
+      <div class="field"><label>Name</label><input id="cfName" placeholder="Owner name" value="${esc(d.name||"")}" autocomplete="name"></div>
+      <div class="field"><label>Phone</label><input id="cfPhone" type="tel" inputmode="tel" placeholder="Phone" value="${esc(d.phone||"")}"></div>
+    </div>
+    <div class="hint" style="margin:-6px 2px 14px;color:var(--text-3);font-size:12px">Add a name or phone (at least one) so the customer can be searched and matched to washes.</div>
+    <div class="f2">
+      <div class="field"><label>Vehicle number</label><input id="cfNum" placeholder="KL 07 AB 1234" value="${esc(vn0)}" style="text-transform:uppercase" autocomplete="off" autocapitalize="characters"></div>
+      <div class="field"><label>Vehicle type</label><select id="cfType">${["",...config.vehicleTypes].map(t=>`<option ${t===vt0?"selected":""} value="${esc(t)}">${t||"Select"}</option>`).join("")}</select></div>
+    </div>
+    <div class="field"><label>Vehicle name / model</label><input id="cfVehName" placeholder="e.g. Swift, Honda City" value="${esc(vnm0)}"></div>
+    <div class="field"><label>Notes</label><textarea id="cfNotes" placeholder="Optional">${esc(d.notes||"")}</textarea></div>
+  `,[
+    ...(existing?[{label:"Delete",cls:"danger",fn:async()=>{if(!confirm("Remove this customer from the database? Their wash history stays."))return;
+      try{await db.collection("shops").doc(state.shopId).collection("customers").doc(existing.key).delete();closeSheet();toast("Customer removed");}
+      catch(e){toast("Could not delete: "+e.message,"err");}}}]:[]),
+    {label:key?"Save":"Add customer",cls:"primary",fn:()=>saveCustomer(existing?existing.key:null)}
+  ]);
+}
+async function saveCustomer(oldKey){
+  const name=$("#cfName").value.trim();
+  const phone=$("#cfPhone").value.trim();
+  if(!name&&!phone){toast("Add a name or phone","err");return;}
+  const key=phone||("name:"+name.toLowerCase());
+  const num=$("#cfNum").value.trim().toUpperCase();
+  const type=$("#cfType").value;
+  const rec=customers.find(c=>c.key===key)||(oldKey?customers.find(c=>c.key===oldKey):null);
+  const vname=$("#cfVehName").value.trim();
+  const vehicles=Object.assign({},rec?rec.vehicles:{});
+  const vehicleNames=Object.assign({},rec?rec.vehicleNames:{});
+  if(num){vehicles[num]=type||vehicles[num]||"";if(vname)vehicleNames[num]=vname;}
+  const obj={key,name,phone,vehicles,vehicleNames,notes:$("#cfNotes").value.trim(),updatedAt:Date.now()};
+  try{
+    const col=db.collection("shops").doc(state.shopId).collection("customers");
+    if(oldKey&&oldKey!==key)await col.doc(oldKey).delete().catch(()=>{});
+    await col.doc(key).set(obj,{merge:true});
+    closeSheet();haptic();toast(oldKey?"Customer updated":"Customer added");
+  }catch(e){toast("Could not save: "+e.message,"err");}
+}
+
+/* ============================ Settle dues / UPI collect ============================ */
+async function settleEntry(id){
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  try{
+    await shopCol("entries").doc(id).update({received:e.amount,due:0,updatedAt:Date.now()});
+    closeSheet();haptic();toast("Due settled");
+  }catch(err){toast("Could not settle: "+err.message,"err");}
+}
+async function settleCustomerDues(key){
+  const batch=db.batch();let n=0;
+  entries.forEach(e=>{
+    const k=(e.phone||"").trim()||("name:"+(e.name||"").trim().toLowerCase())||e.id;
+    if(k===key&&e.due>0){batch.update(shopCol("entries").doc(e.id),{received:e.amount,due:0,updatedAt:Date.now()});n++;}
+  });
+  if(!n)return;
+  try{await batch.commit();haptic();toast("Dues marked paid");}
+  catch(err){toast("Could not settle: "+err.message,"err");}
+}
+
+/* ============================ FINANCE view (owner only) ============================ */
+let finOffset=0,finTab="ledger";
+function finRange(){const b=new Date();const d=new Date(b.getFullYear(),b.getMonth()+finOffset,1);const e=new Date(d.getFullYear(),d.getMonth()+1,0);
+  return{from:ymd(d),to:ymd(e),label:MON[d.getMonth()]+" "+d.getFullYear()};}
+function renderFinance(){
+  const v=$("#view-finance");if(!v)return;
+  if(isEmployee()){v.innerHTML=emptyState("Owner only.","Finance is only visible to the shop owner.");return;}
+  const r=finRange();
+  const head=`
+    <div class="seg" id="finSeg" style="margin-top:2px">
+      <button data-ft="ledger" class="${finTab==="ledger"?"active":""}">Ledger</button>
+      <button data-ft="salary" class="${finTab==="salary"?"active":""}">Salary</button>
+    </div>
+    <div class="period-nav">
+      <div class="label">${esc(r.label)}</div>
+      <div class="navbtns">
+        <button id="fPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button id="fNext" aria-label="Next month" ${finOffset>=0?"disabled":""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>`;
+  v.innerHTML=head+(finTab==="salary"?salaryBody(r):ledgerBody(r));
+  $("#finSeg").querySelectorAll("[data-ft]").forEach(b=>b.onclick=()=>{finTab=b.dataset.ft;renderFinance();});
+  $("#fPrev").onclick=()=>{finOffset--;renderFinance();};
+  $("#fNext").onclick=()=>{if(finOffset<0){finOffset++;renderFinance();}};
+  if(finTab==="salary"){
+    v.querySelectorAll("[data-staff]").forEach(el=>el.onclick=()=>openStaffForm(el.dataset.staff));
+    v.querySelectorAll(".sbtn").forEach(el=>el.onclick=ev=>{ev.stopPropagation();openPayForm(el.dataset.sid,el.dataset.kind);});
+  }else{
+    v.querySelectorAll("[data-fin]").forEach(el=>el.onclick=()=>openFinanceForm(el.dataset.fin));
+  }
+  updateFinFab();
+}
+function updateFinFab(){if(current==="finance"){const lbl=$("#addBtnLabel");if(lbl)lbl.textContent=finTab==="salary"?"Add employee":"Add entry";}}
+function ledgerBody(r){
+  const washColl=entries.filter(e=>e.date>=r.from&&e.date<=r.to).reduce((s,e)=>s+(e.received||0),0);
+  const tx=finance.filter(f=>f.date>=r.from&&f.date<=r.to).sort((a,b)=>b.date.localeCompare(a.date)||(b.created||0)-(a.created||0));
+  const otherInc=tx.filter(f=>f.type==="income").reduce((s,f)=>s+f.amount,0);
+  const exp=tx.filter(f=>f.type==="expense").reduce((s,f)=>s+f.amount,0);
+  const income=washColl+otherInc;const net=income-exp;
+  const cat={};tx.filter(f=>f.type==="expense").forEach(f=>{cat[f.category]=(cat[f.category]||0)+f.amount;});
+  const catArr=Object.entries(cat).sort((a,b)=>b[1]-a[1]);const catMax=Math.max(1,...catArr.map(c=>c[1]));
+  return `
+    <div class="stat-grid">
+      <div class="stat hero"><div class="lbl">Net profit</div><div class="val num" style="color:${net>=0?'var(--hero-accent)':'var(--due)'}">${money(net)}</div></div>
+      <div class="stat accent-green"><div class="lbl">Income</div><div class="val sm num">${money(income)}</div></div>
+      <div class="stat accent-red"><div class="lbl">Expenses</div><div class="val sm num">${money(exp)}</div></div>
+    </div>
+    <div class="card" style="padding:13px 15px;margin-top:12px">
+      <div class="row" style="justify-content:space-between;font-size:13.5px"><span class="muted">Wash collections</span><span class="num" style="font-weight:600">${money(washColl)}</span></div>
+      <div class="row" style="justify-content:space-between;font-size:13.5px;margin-top:7px"><span class="muted">Other income</span><span class="num" style="font-weight:600">${money(otherInc)}</span></div>
+    </div>
+    ${catArr.length?`<div class="section-title">Where money went</div><div class="card" style="padding:15px"><div class="catbar">${catArr.map(([c,val])=>`<div class="cb"><div class="crow"><span>${esc(c)}</span><span class="num" style="font-weight:600">${money(val)}</span></div><div class="track"><div class="fill" style="width:${(val/catMax*100).toFixed(0)}%"></div></div></div>`).join("")}</div></div>`:""}
+    <div class="section-title">Transactions</div>
+    <div>${tx.length?tx.map(finRow).join(""):emptyState("No income or expenses this month.","Tap Add entry to record salary, supplies or extra income.")}</div>`;
+}
+function salaryBody(r){
+  if(!staff.length)return emptyState("No employees yet.","Tap Add employee to set up salary tracking.");
+  const list=staff.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  let totSal=0,totPaid=0,totDue=0;
+  const cards=list.map(s=>{
+    const tx=finance.filter(f=>f.staffId===s.id&&f.date>=r.from&&f.date<=r.to);
+    const paid=tx.reduce((a,f)=>a+f.amount,0);
+    const adv=tx.filter(f=>f.category==="Advance").reduce((a,f)=>a+f.amount,0);
+    const due=Math.max(0,(s.monthlySalary||0)-paid);
+    totSal+=s.monthlySalary||0;totPaid+=paid;totDue+=due;
+    return `<div class="card staff" data-staff="${s.id}">
+      <div class="srow"><div class="snm">${esc(s.name||"Employee")}</div><div class="ssal num">${money(s.monthlySalary||0)}<span>/mo</span></div></div>
+      <div class="sstats">
+        <div><span class="l">Paid</span><span class="v num" style="color:var(--success)">${money(paid)}</span></div>
+        <div><span class="l">Advance</span><span class="v num">${money(adv)}</span></div>
+        <div><span class="l">Due</span><span class="v num" style="color:${due>0?'var(--danger)':'var(--text-3)'}">${money(due)}</span></div>
+      </div>
+      <div class="sact">
+        <button class="btn ghost sbtn" data-sid="${s.id}" data-kind="salary">Pay salary</button>
+        <button class="btn ghost sbtn" data-sid="${s.id}" data-kind="advance">Give advance</button>
+      </div>
+    </div>`;
+  }).join("");
+  return `<div class="stat-grid" style="margin-bottom:2px">
+      <div class="stat hero"><div class="lbl">Payroll due</div><div class="val num" style="color:${totDue>0?'var(--due)':'var(--hero-accent)'}">${money(totDue)}</div></div>
+      <div class="stat"><div class="lbl">Monthly payroll</div><div class="val sm num">${money(totSal)}</div></div>
+      <div class="stat"><div class="lbl">Paid this month</div><div class="val sm num">${money(totPaid)}</div></div>
+    </div>
+    <div class="section-title">Employees · tap to edit</div>${cards}`;
+}
+function finRow(f){
+  const ic=f.type==="income"
+    ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'
+    :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
+  return `<div class="fin-row ${f.type}" data-fin="${f.id}">
+    <div class="ic">${ic}</div>
+    <div class="mid"><div class="d">${esc(f.description||f.category)}</div><div class="c">${esc(f.category)} · ${esc(relDay(f.date))}${f.mode?" · "+esc(f.mode):""}</div></div>
+    <div class="amt num">${f.type==="expense"?"-":"+"}${money(f.amount)}</div>
+  </div>`;
+}
+
+/* Finance form */
+function openFinanceForm(id){
+  const f=id?finance.find(x=>x.id===id):null;
+  const d=f||{date:todayStr(),type:"expense",category:"Salary",description:"",amount:"",mode:"Cash"};
+  function catOptions(type,sel){const list=type==="income"?PAY_INCOME:PAY_EXPENSE;return list.map(c=>`<option ${c===sel?"selected":""}>${esc(c)}</option>`).join("");}
+  openSheet(id?"Edit entry":"Add entry",`
+    <div class="field"><label>Type</label>
+      <div class="seg" id="fType">
+        <button type="button" data-t="expense" class="${d.type==="expense"?"active":""}">Expense</button>
+        <button type="button" data-t="income" class="${d.type==="income"?"active":""}">Income</button>
+      </div>
+    </div>
+    <div class="f2">
+      <div class="field"><label>Date</label><input type="date" id="fDate" value="${esc(d.date)}" max="${todayStr()}"></div>
+      <div class="field"><label>Category</label><select id="fCat">${catOptions(d.type,d.category)}</select></div>
+    </div>
+    <div class="field"><label>Description</label><input id="fDesc" placeholder="e.g. Ramesh salary, soap refill" value="${esc(d.description)}"></div>
+    <div class="f2">
+      <div class="field err-host" id="fAmtHost"><label>Amount <span class="req">*</span></label><input id="fAmt" type="number" inputmode="decimal" placeholder="0" value="${esc(d.amount)}"><div class="errmsg">Enter a valid amount</div></div>
+      <div class="field"><label>Paid via</label><select id="fMode"><option ${d.mode==="Cash"?"selected":""}>Cash</option><option ${d.mode==="UPI"?"selected":""}>UPI</option></select></div>
+    </div>
+  `,[
+    ...(id?[{label:"Delete",cls:"danger",fn:async()=>{if(!confirm("Delete this entry?"))return;
+      try{await shopCol("finance").doc(id).delete();closeSheet();toast("Entry deleted");}catch(e){toast("Could not delete: "+e.message,"err");}}}]:[]),
+    {label:id?"Save":"Add entry",cls:"primary",fn:()=>saveFinance(id)}
+  ]);
+  let ftype=d.type;
+  $("#fType").querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{ftype=b.dataset.t;
+    $("#fType").querySelectorAll("[data-t]").forEach(x=>x.classList.toggle("active",x.dataset.t===ftype));
+    $("#fCat").innerHTML=catOptions(ftype,"");});
+  window._getFinType=()=>ftype;
+}
+async function saveFinance(id){
+  const amount=parseFloat($("#fAmt").value);
+  $("#fAmtHost").classList.toggle("err",!(amount>0));
+  if(!(amount>0)){toast("Enter a valid amount","err");return;}
+  const obj={date:$("#fDate").value||todayStr(),type:window._getFinType(),
+    category:$("#fCat").value,description:$("#fDesc").value.trim(),amount,mode:$("#fMode").value,
+    createdBy:state.uid,createdByName:state.name,updatedAt:Date.now()};
+  try{
+    if(id){await shopCol("finance").doc(id).set(obj,{merge:true});}
+    else{obj.created=Date.now();await shopCol("finance").add(obj);}
+    closeSheet();haptic();toast(id?"Entry updated":"Entry added");
+  }catch(e){toast("Could not save: "+e.message,"err");}
+}
+
+/* Staff / salary management */
+function openStaffForm(id){
+  const s=id?staff.find(x=>x.id===id):null;
+  const d=s||{name:"",phone:"",monthlySalary:"",notes:""};
+  openSheet(id?"Edit employee":"Add employee",`
+    <div class="field"><label>Name <span class="req">*</span></label><input id="stName" placeholder="Employee name" value="${esc(d.name)}"></div>
+    <div class="f2">
+      <div class="field err-host" id="stSalHost"><label>Monthly salary <span class="req">*</span></label><input id="stSal" type="number" inputmode="decimal" placeholder="0" value="${esc(d.monthlySalary)}"><div class="errmsg">Enter monthly salary</div></div>
+      <div class="field"><label>Phone</label><input id="stPhone" type="tel" inputmode="tel" placeholder="Optional" value="${esc(d.phone||"")}"></div>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="stNotes" placeholder="Optional">${esc(d.notes||"")}</textarea></div>
+    ${id?'<div class="section-title">This month</div><div id="stHist"></div>':""}
+  `,[
+    ...(id?[{label:"Delete",cls:"danger",fn:async()=>{if(!confirm("Remove this employee? Past payments stay in the ledger."))return;
+      try{await shopCol("staff").doc(id).delete();closeSheet();toast("Employee removed");}catch(e){toast("Could not delete: "+e.message,"err");}}}]:[]),
+    {label:id?"Save":"Add employee",cls:"primary",fn:async()=>{
+      const name=$("#stName").value.trim();const sal=parseFloat($("#stSal").value);
+      if(!name){toast("Enter a name","err");return;}
+      $("#stSalHost").classList.toggle("err",!(sal>=0));if(!(sal>=0)){toast("Enter monthly salary","err");return;}
+      const obj={name,phone:$("#stPhone").value.trim(),monthlySalary:sal,active:true,notes:$("#stNotes").value.trim(),updatedAt:Date.now()};
+      try{
+        if(id){await shopCol("staff").doc(id).set(obj,{merge:true});}
+        else{await shopCol("staff").add(obj);}
+        closeSheet();haptic();toast(id?"Employee updated":"Employee added");
+      }catch(e){toast("Could not save: "+e.message,"err");}
+    }}
+  ]);
+  if(id){const r=finRange();const tx=finance.filter(f=>f.staffId===id&&f.date>=r.from&&f.date<=r.to).sort((a,b)=>b.date.localeCompare(a.date));
+    const host=$("#stHist");if(host)host.innerHTML='<div class="vlist">'+(tx.length?tx.map(f=>`<div class="vi"><span>${esc(relDay(f.date))} · ${esc(f.category)}${f.note?" · "+esc(f.note):""}</span><span class="num" style="font-weight:600">${money(f.amount)}</span></div>`).join(""):'<div class="muted" style="font-size:13px;padding:6px 2px">No payments this month.</div>')+'</div>';}
+}
+function openPayForm(sid,kind){
+  const s=staff.find(x=>x.id===sid);if(!s)return;
+  const isAdv=kind==="advance";
+  openSheet((isAdv?"Give advance":"Pay salary")+" · "+(s.name||"Employee"),`
+    <div class="field err-host" id="pAmtHost"><label>Amount <span class="req">*</span></label><input id="pAmt" type="number" inputmode="decimal" placeholder="0" value=""><div class="errmsg">Enter a valid amount</div></div>
+    <div class="f2">
+      <div class="field"><label>Date</label><input type="date" id="pDate" value="${todayStr()}" max="${todayStr()}"></div>
+      <div class="field"><label>Paid via</label><select id="pMode"><option>Cash</option><option>UPI</option></select></div>
+    </div>
+    <div class="field"><label>Note</label><input id="pNote" placeholder="Optional"></div>
+    <div class="hint" style="margin-top:2px;color:var(--text-3);font-size:12px">Saved as a ${isAdv?"advance":"salary"} expense in this month's finance ledger.</div>
+  `,[{label:isAdv?"Give advance":"Pay salary",cls:"primary",fn:async()=>{
+    const amount=parseFloat($("#pAmt").value);$("#pAmtHost").classList.toggle("err",!(amount>0));if(!(amount>0)){toast("Enter a valid amount","err");return;}
+    const date=$("#pDate").value||todayStr();
+    const obj={type:"expense",category:isAdv?"Advance":"Salary",staffId:sid,month:date.slice(0,7),date,amount,mode:$("#pMode").value,description:(s.name||"Employee")+(isAdv?" advance":" salary"),note:$("#pNote").value.trim(),created:Date.now(),updatedAt:Date.now()};
+    try{await shopCol("finance").add(obj);closeSheet();haptic();toast(isAdv?"Advance recorded":"Salary paid");}
+    catch(e){toast("Could not save: "+e.message,"err");}
+  }}]);
+}
+
+/* ============================ Sheets / Forms shell ============================ */
+let sheetFootBtns=[];
+function openSheet(title,html,footBtns){
+  $("#sheetTitle").textContent=title;
+  $("#sheetBody").innerHTML=html;
+  const foot=$("#sheetFoot");
+  if(footBtns&&footBtns.length){
+    foot.style.display="flex";
+    foot.innerHTML=footBtns.map((b,i)=>`<button class="btn ${b.cls||"ghost"}" data-fb="${i}">${esc(b.label)}</button>`).join("");
+    sheetFootBtns=footBtns;
+    foot.querySelectorAll("[data-fb]").forEach(el=>el.onclick=()=>sheetFootBtns[el.dataset.fb].fn());
+  }else{foot.style.display="none";foot.innerHTML="";}
+  $("#scrim").classList.add("show");$("#sheet").classList.add("show");
+  document.body.style.overflow="hidden";
+}
+function closeSheet(){$("#scrim").classList.remove("show");$("#sheet").classList.remove("show");document.body.style.overflow="";}
+$("#sheetClose").onclick=closeSheet;$("#scrim").onclick=closeSheet;
+
+/* ============================ Menu ============================ */
+function openMenu(){
+  const owner=!isEmployee();
+  openSheet("Menu",`
+    <div class="menu-item" id="mSettings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.8-1.4-1.8-3.1-2.2.9a7.6 7.6 0 0 0-2.6-1.5L14 2h-4l-.3 2.4a7.6 7.6 0 0 0-2.6 1.5l-2.2-.9-1.8 3.1L4.9 10.5a7.8 7.8 0 0 0 0 3L3 15l1.8 3.1 2.2-.9a7.6 7.6 0 0 0 2.6 1.5L10 22h4l.3-2.4a7.6 7.6 0 0 0 2.6-1.5l2.2.9L21 15Z"/></svg><div><div>Settings</div><div class="muted" style="font-size:12px">${owner?"Catalog, payments, plate scan, WhatsApp":"App preferences"}</div></div></div>
+    <div class="menu-item danger" id="mSignout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><div><div>Sign out</div><div class="muted" style="font-size:12px">${esc(state.email||"")}</div></div></div>
+    <div style="text-align:center;color:var(--text-3);font-size:12px;margin-top:18px">Wipe Out · ${esc(config.businessName||"")} · ${owner?entries.length+" washes · "+finance.length+" ledger entries":"Staff account"}<br>Synced live via Firebase</div>
+  `);
+  $("#mSettings").onclick=()=>{closeSheet();openSettings();};
+  $("#mSignout").onclick=()=>{closeSheet();doSignOut();};
+}
+
+/* ============================ Navigation ============================ */
+const NAV=[
+  {id:"today",label:"Today",icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>',add:"Add wash"},
+  {id:"insights",label:"Insights",icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',add:null},
+  {id:"customers",label:"Customers",icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0M17 5.5a3 3 0 0 1 0 5.8M20.5 20a5 5 0 0 0-3.5-4.8"/></svg>',add:"Add customer"},
+  {id:"finance",label:"Finance",icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12H3zM3 11h18M7 15h3"/></svg>',add:"Add entry"},
+  {id:"team",label:"Team",icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 4.5a3 3 0 0 1 0 5.8M20.5 20a5 5 0 0 0-3.8-4.8"/></svg>',add:null}
+];
+let current="today";
+function visibleNav(){return isEmployee()?NAV.filter(n=>EMP_VIEWS.includes(n.id)):NAV;}
+function buildNav(){
+  $("#nav").innerHTML=visibleNav().map(n=>`<button data-nav="${n.id}" class="${n.id===current?"active":""}" style="position:relative">${n.icon}<span>${n.label}</span><span class="dot" data-badge="${n.id}" style="display:none"></span></button>`).join("");
+  $("#nav").querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>go(b.dataset.nav));
+}
+function go(id){
+  if(isEmployee()&&!EMP_VIEWS.includes(id))id="today";
+  if(!$("#view-"+id))id="today";
+  current=id;
+  $("#nav").querySelectorAll("[data-nav]").forEach(b=>b.classList.toggle("active",b.dataset.nav===id));
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  $("#view-"+id).classList.add("active");
+  const n=NAV.find(x=>x.id===id);
+  const ab=$("#addBtn");
+  if(n&&n.add){ab.style.display="inline-flex";$("#addBtnLabel").textContent=n.add;}else ab.style.display="none";
+  renderCurrent();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+function renderCurrent(){
+  const fn={today:renderToday,insights:renderInsights,customers:renderCustomers,finance:renderFinance,team:renderTeam}[current];
+  if(fn)fn();
+  refreshBadges();
+}
+$("#addBtn").onclick=()=>{
+  if(current==="today")openWashForm();
+  else if(current==="finance"){finTab==="salary"?openStaffForm():openFinanceForm();}
+  else if(current==="customers")openCustomerForm();
+};
+
+function refreshBadges(){
+  const el=$('[data-badge="customers"]');
+  if(!el)return;
+  const dueCount=isEmployee()?0:autoDueReminders().length;
+  el.style.display=dueCount>0?"block":"none";
+}
+
+/* ============================ Theme ============================ */
+function applyTheme(t){
+  const dark=t==="dark"||(t==null&&matchMedia("(prefers-color-scheme:dark)").matches);
+  document.documentElement.setAttribute("data-theme",dark?"dark":"light");
+  const tb=$("#themeBtn");
+  if(tb)tb.innerHTML=dark
+    ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>'
+    :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>';
+  const mt=document.querySelector('meta[name=theme-color]');
+  if(mt)mt.setAttribute("content",dark?"#1b1f22":"#ffffff");
+}
+$("#themeBtn").onclick=()=>{const cur=document.documentElement.getAttribute("data-theme");const next=cur==="dark"?"light":"dark";localSet(LK.theme,next);applyTheme(next);};
+$("#menuBtn").onclick=openMenu;
+
+/* ============================ Wash form ============================ */
+function openWashForm(id){
+  const e=id?entries.find(x=>x.id===id):null;
+  const d=e||{date:todayDate,vehicleType:"",service:"",vehicleNumber:"",vehicleName:"",name:"",phone:"",amount:"",mode:"Cash",received:"",due:0,notes:"",status:"waiting"};
+  const pay=e?(e.due>0&&e.received>0?"Partial":e.due>0?"Due":e.mode):"Cash";
+  const veh=config.vehicleTypes&&config.vehicleTypes.length?config.vehicleTypes:DEFAULT_VEH;
+  const svc=config.services&&config.services.length?config.services:DEFAULT_SERVICES;
+  openSheet(id?"Edit wash":"Add wash",`
+    <button type="button" class="btn ghost block" id="wScan" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.4-2h7.2L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.1"/></svg>Scan number plate</button>
+    <input type="file" accept="image/*" capture="environment" id="wCam" style="display:none">
+    <div class="field"><label>Date</label><input type="date" id="wDate" value="${esc(d.date)}" max="${todayStr()}"></div>
+    <div class="f2">
+      <div class="field"><label>Vehicle type</label><select id="wType">${["",...veh].map(t=>`<option ${t===d.vehicleType?"selected":""} value="${esc(t)}">${t||"Select"}</option>`).join("")}</select></div>
+      <div class="field err-host ac-host" id="wNumHost"><label>Vehicle number <span class="req">*</span></label><input id="wNum" placeholder="Start typing, e.g. KL 07" value="${esc(d.vehicleNumber)}" style="text-transform:uppercase" autocomplete="off" autocapitalize="characters"><div class="ac" id="wNumAc"></div><div class="errmsg">Enter the vehicle number</div></div>
+    </div>
+    <div class="field"><label>Vehicle name / model</label><input id="wVehName" placeholder="e.g. Swift, Honda City" value="${esc(d.vehicleName||'')}"></div>
+    <div class="field"><label>Service</label><select id="wService">${["",...svc].map(t=>`<option ${t===d.service?"selected":""} value="${esc(t)}">${t||"Select (optional)"}</option>`).join("")}</select></div>
+    <div class="f2">
+      <div class="field"><label>Owner name</label><input id="wName" placeholder="Name" value="${esc(d.name)}" autocomplete="name"></div>
+      <div class="field"><label>Phone</label><input id="wPhone" type="tel" placeholder="Phone" value="${esc(d.phone)}" inputmode="tel" autocomplete="tel"></div>
+    </div>
+    <div class="field err-host" id="wAmtHost"><label>Amount <span class="req">*</span></label><input id="wAmt" type="number" inputmode="decimal" placeholder="0" value="${esc(d.amount)}"><div class="hint" id="wAmtHint"></div><div class="errmsg">Enter a valid amount</div></div>
+    <div class="field"><label>Payment</label>
+      <div class="paychip" id="wPay">${["Cash","UPI","Partial","Due"].map(p=>`<button type="button" data-pay="${p}" class="${pay===p?"on":""}">${p}</button>`).join("")}</div>
+    </div>
+    <div class="field" id="wRecvHost" style="display:${pay==="Partial"?"block":"none"}"><label>Amount received</label><input id="wRecv" type="number" inputmode="decimal" placeholder="0" value="${esc(d.received)}"><div class="hint" id="wDueHint"></div></div>
+    <button type="button" class="btn ghost block" id="wCollect" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="7" rx="1.5"/><path d="M14 15h3v5M20 14v6"/></svg>Show UPI QR to collect</button>
+    <div class="field"><label>Notes</label><textarea id="wNotes" placeholder="Optional">${esc(d.notes)}</textarea></div>
+  `,[
+    ...(id?[{label:"Delete",cls:"danger",fn:async()=>{if(confirm("Delete this wash entry?")){try{await shopCol("entries").doc(id).delete();closeSheet();toast("Wash deleted");}catch(err){toast("Could not delete: "+err.message,"err");}}}}]:[]),
+    ...((id&&e&&e.due>0)?[{label:"Settle due ("+money(e.due)+")",cls:"ghost",fn:()=>settleEntry(id)}]:[]),
+    {label:id?"Save":"Add wash",cls:"primary",fn:()=>saveWash(id)}
+  ]);
+  // payment chip logic
+  let payMode=pay;
+  const chips=$("#wPay");
+  function setPay(p){payMode=p;chips.querySelectorAll("[data-pay]").forEach(b=>b.classList.toggle("on",b.dataset.pay===p));
+    $("#wRecvHost").style.display=p==="Partial"?"block":"none";updateDueHint();}
+  chips.querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>setPay(b.dataset.pay));
+  function updateDueHint(){const amt=parseFloat($("#wAmt").value)||0;const rec=parseFloat($("#wRecv").value)||0;
+    const due=Math.max(0,amt-rec);$("#wDueHint").textContent=payMode==="Partial"?money(due)+" will be marked as due":"";}
+  $("#wAmt").oninput=()=>{amtTouched=true;updateDueHint();};
+  $("#wRecv").oninput=updateDueHint;
+  // catalog price auto-fill (only until the user edits the amount manually)
+  let amtTouched=!!(d.amount);
+  function applyCatalogPrice(){
+    if(amtTouched)return;
+    const p=priceFor(config,$("#wType").value,$("#wService").value);
+    if(p!=null){$("#wAmt").value=p;$("#wAmtHint").textContent="Auto-filled from your price list";updateDueHint();}
+    else{$("#wAmtHint").textContent="";}
+  }
+  $("#wType").onchange=applyCatalogPrice;
+  $("#wService").onchange=applyCatalogPrice;
+  // vehicle number autocomplete dropdown + autofill
+  const wNum=$("#wNum"), wAc=$("#wNumAc"), vehIndex=buildVehicleIndex();
+  function applyVehicle(s){if(s.name)$("#wName").value=s.name;if(s.phone)$("#wPhone").value=s.phone;if(s.type)$("#wType").value=s.type;if(s.vname)$("#wVehName").value=s.vname;applyCatalogPrice();}
+  function fillFromVehicle(){
+    const vn=wNum.value.trim().toUpperCase();if(!vn)return;
+    const m=filterVehicles(vehIndex,vn).find(s=>s.number===vn);
+    if(m){if(!$("#wName").value&&m.name)$("#wName").value=m.name;if(!$("#wPhone").value&&m.phone)$("#wPhone").value=m.phone;if(m.type)$("#wType").value=m.type;if(m.vname&&!$("#wVehName").value)$("#wVehName").value=m.vname;applyCatalogPrice();if(m.name||m.phone)toast("Owner loaded: "+(m.name||m.phone));}
+  }
+  function renderAc(){
+    const list=filterVehicles(vehIndex,wNum.value);
+    if(!list.length||!wNum.value.trim()){wAc.classList.remove("show");wAc.innerHTML="";return;}
+    wAc.innerHTML=list.map((s,i)=>`<div class="it" data-i="${i}"><span class="vn">${esc(s.number)}</span><span class="nm">${esc(s.name||s.phone||"")}</span></div>`).join("");
+    wAc.classList.add("show");
+    wAc.querySelectorAll(".it").forEach(el=>el.addEventListener("mousedown",ev=>{ev.preventDefault();const s=list[+el.dataset.i];wNum.value=s.number;applyVehicle(s);wAc.classList.remove("show");toast("Owner loaded: "+(s.name||s.phone||s.number));}));
+  }
+  wNum.addEventListener("input",renderAc);
+  wNum.addEventListener("focus",renderAc);
+  wNum.addEventListener("blur",()=>{setTimeout(()=>wAc.classList.remove("show"),160);fillFromVehicle();});
+  $("#wPhone").onblur=()=>{const ph=$("#wPhone").value.trim();if(!ph)return;const c=buildCustomers().find(x=>x.phone===ph);
+    if(c){if(!$("#wName").value)$("#wName").value=c.name;const vs=Object.keys(c.vehicles);if(!$("#wNum").value&&vs.length){$("#wNum").value=vs[0];if(c.vehicles[vs[0]])$("#wType").value=c.vehicles[vs[0]];applyCatalogPrice();}toast("Loaded "+(c.name||"customer"));}};
+  // cloud ANPR plate scan (Plate Recognizer)
+  $("#wScan").onclick=()=>{$("#wCam").click();};
+  $("#wCam").onchange=async(ev)=>{
+    const file=ev.target.files[0];if(!file)return;
+    const btn=$("#wScan");const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span>Scanning plate...';
+    try{
+      const fd=new FormData();fd.append("upload",file);fd.append("regions","in");
+      const res=await fetch("https://api.platerecognizer.com/v1/plate-reader/",{method:"POST",headers:{Authorization:"Token "+((config.prToken||"").trim()||BUILTIN_PR_TOKEN)},body:fd});
+      if(res.status===401||res.status===403){toast("Invalid plate scan key","err");return;}
+      const data=await res.json();
+      const plate=formatPlate(data&&data.results&&data.results[0]&&data.results[0].plate);
+      if(!plate){toast("No plate detected, try a clearer photo","err");return;}
+      wNum.value=plate;
+      const m=filterVehicles(vehIndex,plate).find(x=>x.number===plate);
+      if(m){applyVehicle(m);toast(plate+" · "+(m.name||m.phone||"owner found"));}
+      else toast(plate+" · new vehicle, add details");
+    }catch(err){toast("Scan failed, check internet","err");}
+    finally{btn.disabled=false;btn.innerHTML=orig;ev.target.value="";}
+  };
+  $("#wCollect").onclick=()=>{const amt=parseFloat($("#wAmt").value)||0;if(!(amt>0)){toast("Enter an amount first","err");return;}openUpiPay(amt,wNum.value.trim(),()=>setPay("UPI"));};
+  window._getPay=()=>payMode;
+}
+async function saveWash(id){
+  const date=$("#wDate").value||todayStr();
+  const vehicleNumber=$("#wNum").value.trim().toUpperCase();
+  const amount=parseFloat($("#wAmt").value);
+  const payMode=window._getPay();
+  let ok=true;
+  $("#wNumHost").classList.toggle("err",!vehicleNumber);if(!vehicleNumber)ok=false;
+  $("#wAmtHost").classList.toggle("err",!(amount>=0&&!isNaN(amount)));if(!(amount>=0&&!isNaN(amount)))ok=false;
+  if(!ok){toast("Please fix the highlighted fields","err");return;}
+  let received,due,mode;
+  if(payMode==="Due"){received=0;due=amount;mode="Cash";}
+  else if(payMode==="Partial"){received=Math.min(amount,parseFloat($("#wRecv").value)||0);due=Math.max(0,amount-received);mode="Cash";}
+  else{received=amount;due=0;mode=payMode;}
+  const existing=id?entries.find(x=>x.id===id):null;
+  const obj={
+    date,
+    vehicleType:$("#wType").value,service:$("#wService").value,vehicleName:$("#wVehName").value.trim(),vehicleNumber,
+    name:$("#wName").value.trim(),phone:$("#wPhone").value.trim(),
+    amount,received,due,mode,notes:$("#wNotes").value.trim(),
+    status:existing?(existing.status||"waiting"):"waiting",
+    time:existing?(existing.time||new Date().toTimeString().slice(0,5)):new Date().toTimeString().slice(0,5),
+    createdBy:state.uid,createdByName:state.name,
+    updatedAt:Date.now()
+  };
+  try{
+    if(id){await shopCol("entries").doc(id).set(obj,{merge:true});}
+    else{obj.created=Date.now();await shopCol("entries").add(obj);}
+    closeSheet();haptic();
+    toast(id?"Wash updated":"Wash added");
+    todayDate=date;renderToday();
+  }catch(err){toast("Could not save: "+err.message,"err");}
+}
+
+/* ============================ Settings (catalog, payments, WhatsApp) ============================ */
+let stTypes=[], stServices=[], stPrices={};
+
+function chipListHtml(items,kind){
+  return items.map((t,i)=>`<span class="chip" data-${kind}i="${i}">${esc(t)}<button type="button" data-${kind}x="${i}" aria-label="Remove">&times;</button></span>`).join("")
+    +`<div class="addchip"><input type="text" placeholder="${kind==='t'?'New vehicle type':'New service'}" data-add${kind}input><button type="button" data-add${kind}>Add</button></div>`;
+}
+function priceMatrixHtml(){
+  if(!stTypes.length||!stServices.length)return '<div class="hint">Add at least one vehicle type and one service to set prices.</div>';
+  return stTypes.map(t=>`
+    <details class="pricegrp" open>
+      <summary>${esc(t)}</summary>
+      ${stServices.map(s=>{
+        const k=priceKey(t,s);
+        const v=stPrices[k];
+        return `<div class="pricerow"><span class="sv">${esc(s)}</span><input type="number" inputmode="decimal" placeholder="—" data-pricekey="${esc(k)}" value="${v==null?"":v}"></div>`;
+      }).join("")}
+    </details>
+  `).join("");
+}
+function renderCatalogEditor(){
+  const tc=$("#stTypesChips"), sc=$("#stServicesChips"), pm=$("#stPriceMatrix");
+  if(!tc)return;
+  tc.innerHTML=chipListHtml(stTypes,"t");
+  sc.innerHTML=chipListHtml(stServices,"s");
+  pm.innerHTML=priceMatrixHtml();
+  tc.querySelectorAll("[data-tx]").forEach(b=>b.onclick=()=>{stTypes.splice(+b.dataset.tx,1);renderCatalogEditor();});
+  sc.querySelectorAll("[data-sx]").forEach(b=>b.onclick=()=>{stServices.splice(+b.dataset.sx,1);renderCatalogEditor();});
+  const addType=()=>{const inp=tc.querySelector("[data-addtinput]");const v=(inp.value||"").trim();if(v){stTypes.push(v);renderCatalogEditor();}};
+  const addSvc=()=>{const inp=sc.querySelector("[data-addsinput]");const v=(inp.value||"").trim();if(v){stServices.push(v);renderCatalogEditor();}};
+  const at=tc.querySelector("[data-addt]");
+  if(at)at.onclick=addType;
+  const ati=tc.querySelector("[data-addtinput]");
+  if(ati)ati.onkeydown=(ev)=>{if(ev.key==="Enter"){ev.preventDefault();addType();}};
+  const as=sc.querySelector("[data-adds]");
+  if(as)as.onclick=addSvc;
+  const asi=sc.querySelector("[data-addsinput]");
+  if(asi)asi.onkeydown=(ev)=>{if(ev.key==="Enter"){ev.preventDefault();addSvc();}};
+  pm.querySelectorAll("[data-pricekey]").forEach(inp=>inp.oninput=()=>{
+    const v=inp.value;
+    if(v==="")delete stPrices[inp.dataset.pricekey];
+    else stPrices[inp.dataset.pricekey]=parseFloat(v);
+  });
+}
+
+function openSettings(){
+  if(isEmployee()){
+    openSheet("Settings",`
+      <div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg><div>Catalog, payments and finance are managed by the shop owner.</div></div>
+      <div class="section-title" style="margin-top:2px">Account</div>
+      <div class="hint">Signed in as ${esc(state.name||state.email)}</div>
+    `,[{label:"Sign out",cls:"danger",fn:()=>{closeSheet();doSignOut();}}]);
+    return;
+  }
+  stTypes=(config.vehicleTypes&&config.vehicleTypes.length?config.vehicleTypes:DEFAULT_VEH).slice();
+  stServices=(config.services&&config.services.length?config.services:DEFAULT_SERVICES).slice();
+  stPrices=Object.assign({},config.prices||{});
+  openSheet("Settings",`
+    <div class="section-title" style="margin-top:2px">Business</div>
+    <div class="field"><label>Business name</label><input id="setBiz" placeholder="Wipe Out Auto Spa" value="${esc(config.businessName||"")}"></div>
+
+    <div class="section-title">Vehicle types</div>
+    <div class="chiplist" id="stTypesChips"></div>
+    <div class="section-title">Services</div>
+    <div class="chiplist" id="stServicesChips"></div>
+    <div class="section-title">Price list</div>
+    <div class="hint" style="margin-bottom:8px">Pick a type + service on a wash and the price fills in automatically.</div>
+    <div id="stPriceMatrix"></div>
+
+    <div class="section-title">Payments (UPI)</div>
+    <div class="field"><label>Your UPI ID</label><input id="setUpi" placeholder="name@bank" value="${esc(config.upiId||"")}" autocapitalize="off" autocomplete="off"><div class="hint">Shows a UPI QR and opens the customer's UPI app. You confirm receipt with Mark received.</div></div>
+
+    <div class="section-title">WhatsApp wash update</div>
+    <div class="field"><label>Message template</label><textarea id="setWaTpl">${esc(config.waTemplate||DEFAULT_WA_TEMPLATE)}</textarea><div class="hint">Placeholders: {name} {vehicle} {plate} {amount} {shop}</div></div>
+    <div class="field wtoggle"><label>Prompt to send WhatsApp when a wash is marked done</label><div class="switch ${config.waAutoPrompt!==false?"on":""}" id="setWaAuto" role="switch" aria-checked="${config.waAutoPrompt!==false}"><div class="kn"></div></div></div>
+
+    <div class="section-title">Team</div>
+    <div class="hint">Add or remove employee logins from the Team tab.</div>
+  `,[{label:"Save settings",cls:"primary",fn:async()=>{
+    const obj={
+      businessName:$("#setBiz").value.trim(),
+      vehicleTypes:stTypes,services:stServices,prices:stPrices,
+      upiId:$("#setUpi").value.trim(),
+      waTemplate:$("#setWaTpl").value.trim()||DEFAULT_WA_TEMPLATE,
+      waAutoPrompt:$("#setWaAuto").classList.contains("on")
+    };
+    try{
+      await configRef().set(obj,{merge:true});
+      closeSheet();toast("Settings saved");
+    }catch(e){toast("Could not save: "+e.message,"err");}
+  }}]);
+  renderCatalogEditor();
+  $("#setWaAuto").onclick=()=>{const sw=$("#setWaAuto");const on=!sw.classList.contains("on");sw.classList.toggle("on",on);sw.setAttribute("aria-checked",on);};
+}
+
+/* UPI collect */
+function openUpiPay(amount,note,onPaid){
+  if(!(config.upiId||"").trim()){toast("Add your UPI ID in Settings","err");openSettings();return;}
+  const str=upiString(config,amount,note);
+  const qr="https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=10&data="+encodeURIComponent(str);
+  openSheet("Collect "+money(amount),`
+    <div style="text-align:center">
+      <div style="display:inline-block;background:#fff;padding:12px;border-radius:18px;box-shadow:var(--shadow-2)"><img src="${qr}" alt="UPI QR code" width="220" height="220" style="display:block;border-radius:8px"></div>
+      <div class="muted" style="font-size:13px;margin-top:14px">Scan with any UPI app, or</div>
+      <a class="btn primary block" href="${str}" style="margin-top:8px">Open UPI app</a>
+      <div class="muted" style="font-size:12px;margin-top:12px">Paying to ${esc(config.upiId)}</div>
+      <div class="muted" style="font-size:11.5px;margin-top:4px;line-height:1.4">The app cannot auto-confirm a UPI payment. Tap Mark received once the money is in.</div>
+    </div>
+  `,[{label:"Close",cls:"ghost",fn:closeSheet},{label:"Mark received",cls:"primary",fn:()=>{closeSheet();if(onPaid)onPaid();}}]);
+}
+
+/* ============================ Team (owner only: staff roster + employee app logins) ============================ */
+function renderTeam(){
+  const v=$("#view-team");
+  if(!v)return;
+  if(isEmployee()){v.innerHTML=emptyState("Owner only.","Team management is only visible to the shop owner.");return;}
+  const logins=config.employeeLogins||[];
+  v.innerHTML=`
+    <div class="section-title" style="margin-top:2px">Employee logins</div>
+    <div class="hint" style="margin-bottom:10px">Give staff their own login so they can add washes and see customers from their phone. They won't see Finance or Team.</div>
+    <button type="button" class="btn ghost block" id="tAddLogin" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M18 8v6M21 11h-6"/></svg>Add employee login</button>
+    <div id="tLoginList">${logins.length?logins.map(loginRow).join(""):emptyState("No employee logins yet.","Add one so staff can log in themselves.")}</div>
+
+    <div class="section-title">Staff & payroll</div>
+    <div class="hint" style="margin-bottom:10px">Salaries, advances and payment history are managed from Finance &rarr; Salary.</div>
+    <div id="tStaffList">${staff.length?staff.filter(s=>s.active!==false).map(teamStaffRow).join(""):emptyState("No staff added yet.","Add employees from Finance to track salary.")}</div>
+  `;
+  $("#tAddLogin").onclick=openEmployeeLoginForm;
+  v.querySelectorAll("[data-tlremove]").forEach(el=>el.onclick=()=>removeLoginConfirm(logins.find(l=>l.uid===el.dataset.tlremove)));
+  v.querySelectorAll("[data-tsview]").forEach(el=>el.onclick=()=>openStaffForm(el.dataset.tsview));
+}
+function initials(n){n=(n||"?").trim();if(!n)return"?";const p=n.split(/\s+/);return((p[0][0]||"")+(p[1]?p[1][0]:"")).toUpperCase();}
+function loginRow(l){
+  return `<div class="teamrow">
+    <div class="av">${esc(initials(l.name||l.email))}</div>
+    <div class="mid">
+      <div class="nm">${esc(l.name||l.email)}</div>
+      <div class="em">${esc(l.email)}</div>
+    </div>
+    <button class="rmv" data-tlremove="${esc(l.uid)}">Remove</button>
+  </div>`;
+}
+function teamStaffRow(s){
+  return `<div class="teamrow" data-tsview="${s.id}" style="cursor:pointer">
+    <div class="av">${esc(initials(s.name))}</div>
+    <div class="mid">
+      <div class="nm">${esc(s.name)}</div>
+      <div class="em">${money(s.monthlySalary)}/mo${s.phone?" · "+esc(s.phone):""}</div>
+    </div>
+  </div>`;
+}
+function removeLoginConfirm(login){
+  if(!login)return;
+  if(!confirm("Remove app access for "+(login.name||login.email)+"? They will no longer be able to log in."))return;
+  removeEmployeeAccess(login).then(()=>toast("Access removed")).catch(err=>toast("Could not remove: "+err.message,"err"));
+}
+function openEmployeeLoginForm(){
+  openSheet("Add employee login",`
+    <div class="field"><label>Employee name <span class="req">*</span></label><input id="elName" placeholder="Staff name"></div>
+    <div class="field"><label>Email <span class="req">*</span></label><input id="elEmail" type="email" inputmode="email" placeholder="staff@email.com" autocapitalize="off" autocomplete="off"></div>
+    <div class="field"><label>Password <span class="req">*</span></label><input id="elPass" type="password" placeholder="At least 6 characters" autocomplete="new-password"></div>
+    <div class="hint">Share this email and password with your employee. They can log in from any phone at this app's address. They'll only see Today and Customers.</div>
+  `,[{label:"Create login",cls:"primary",fn:async()=>{
+    const name=$("#elName").value.trim(),email=$("#elEmail").value.trim(),pass=$("#elPass").value;
+    if(!name||!email||!pass){toast("Fill in all fields","err");return;}
+    if(pass.length<6){toast("Password should be at least 6 characters","err");return;}
+    try{
+      await createEmployeeAccount(name,email,pass);
+      closeSheet();haptic();toast("Employee login created");
+    }catch(e){toast(authErrMsg(e),"err");}
+  }}]);
+}
+
+/* ============================ Boot ============================ */
+bootWipeOut();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+rules_version = '2';
+
+// Wipe Out — Firestore security rules
+// Paste this whole file into Firebase Console -> Firestore Database -> Rules, then Publish.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function membership() {
+      return get(/databases/$(database)/documents/memberships/$(request.auth.uid)).data;
+    }
+
+    function isMember(shopId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/memberships/$(request.auth.uid))
+        && membership().shopId == shopId;
+    }
+
+    function isOwner(shopId) {
+      return isMember(shopId) && membership().role == 'owner';
+    }
+
+    // Multi-tenant: this one Firebase project hosts any number of shops, each isolated
+    // by shopId. A user can always read their own membership doc (to resolve which
+    // shop/role they have).
+    //
+    // Creating a membership doc is allowed in exactly two cases:
+    //  1. Self-signup — a signed-in user may create ONE membership doc for themselves
+    //     as OWNER, but the shopId must equal their own uid. This is what lets anyone
+    //     start a brand-new, fully isolated shop, while making it impossible to ever
+    //     claim an existing shop: two different accounts never share a uid, so no one
+    //     can write a membership doc claiming someone else's shopId as owner this way.
+    //  2. The existing owner of a shop creating (or removing) an employee's membership
+    //     doc for that same shop — this is how Team -> Add employee login works.
+    match /memberships/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn()
+        && ((request.auth.uid == uid
+             && request.resource.data.role == 'owner'
+             && request.resource.data.shopId == uid)
+            || isOwner(request.resource.data.shopId));
+      allow update, delete: if signedIn() && isOwner(resource.data.shopId);
+    }
+
+    match /shops/{shopId} {
+      allow read: if isMember(shopId);
+      allow write: if isOwner(shopId);
+
+      match /settings/config {
+        allow read: if isMember(shopId);
+        allow write: if isOwner(shopId);
+      }
+
+      match /entries/{entryId} {
+        allow read, create, update: if isMember(shopId);
+        allow delete: if isOwner(shopId);
+      }
+
+      match /customers/{custId} {
+        allow read, create, update, delete: if isMember(shopId);
+      }
+
+      match /finance/{finId} {
+        allow read, create, update, delete: if isOwner(shopId);
+      }
+
+      match /staff/{staffId} {
+        allow read, create, update, delete: if isOwner(shopId);
+      }
+    }
+  }
+}
