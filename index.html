@@ -685,20 +685,55 @@ const state={uid:null,email:null,shopId:null,role:null,name:""};
 let config=defaultConfig();
 let entries=[], finance=[], customers=[], staff=[];
 let unsubs=[];
+let entriesFirstLoad=true;
 
 function detachListeners(){unsubs.forEach(u=>{try{u();}catch(e){}});unsubs=[];}
 
 function shopCol(name){return db.collection("shops").doc(state.shopId).collection(name);}
 function configRef(){return db.collection("shops").doc(state.shopId).collection("settings").doc("config");}
 
+/* In-app new-wash alert (works whenever this tab/app is open, no server needed) */
+function playChime(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator();const g=ctx.createGain();
+    o.type="sine";o.frequency.value=880;
+    g.gain.setValueAtTime(0.0001,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.22,ctx.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.4);
+    o.connect(g);g.connect(ctx.destination);
+    o.start();o.stop(ctx.currentTime+0.42);
+  }catch(e){}
+}
+function notifyNewWash(e){
+  const who=e.createdByName||"An employee";
+  const msg=who+" added a wash · "+(e.vehicleNumber||"vehicle")+" · "+money(e.amount||0);
+  toast(msg);
+  playChime();
+  try{
+    if("Notification" in window && Notification.permission==="granted"){
+      new Notification("New wash added",{body:msg,icon:"icons/icon-192.png",tag:"wipeout-newwash"});
+    }
+  }catch(err){}
+}
 function attachListeners(){
   detachListeners();
+  entriesFirstLoad=true;
   unsubs.push(configRef().onSnapshot(snap=>{
     config=Object.assign(defaultConfig(),snap.exists?snap.data():{});
     renderCurrent();
   },()=>{}));
   unsubs.push(shopCol("entries").onSnapshot(snap=>{
+    if(!entriesFirstLoad&&!isEmployee()){
+      snap.docChanges().forEach(ch=>{
+        if(ch.type==="added"){
+          const d={id:ch.doc.id,...ch.doc.data()};
+          if(d.createdBy&&d.createdBy!==state.uid)notifyNewWash(d);
+        }
+      });
+    }
     entries=snap.docs.map(d=>({id:d.id,...d.data()}));
+    entriesFirstLoad=false;
     renderCurrent();
   },err=>toast("Sync error (washes): "+err.message,"err")));
   unsubs.push(shopCol("customers").onSnapshot(snap=>{
@@ -744,6 +779,9 @@ async function onAuthChanged(user){
     state.uid=user.uid;state.email=user.email;state.shopId=m.shopId;state.role=m.role||"employee";state.name=m.name||user.email;
     attachListeners();
     showApp();
+    if(state.role==="owner"){
+      try{if("Notification" in window && Notification.permission==="default")Notification.requestPermission();}catch(e){}
+    }
   }catch(e){
     showAuthScreen("Could not verify your account: "+e.message);
   }
@@ -895,7 +933,7 @@ const BUILTIN_FIREBASE_CONFIG={
 const BUILTIN_PR_TOKEN="6e531ec041f64580582bca34414dc2abc6b03a7e";
 /* Bump this every time index.html or sw.js changes, so it's visible in Settings/Menu
    and you can tell at a glance whether a phone has picked up the latest update. */
-const APP_VERSION="v8";
+const APP_VERSION="v9";
 function bootWipeOut(){
   const saved=localGet(LK.cfg,null)||BUILTIN_FIREBASE_CONFIG;
   applyTheme(localGet(LK.theme,null));
