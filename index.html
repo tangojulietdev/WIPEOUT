@@ -961,7 +961,7 @@ const BUILTIN_FIREBASE_CONFIG={
 const BUILTIN_PR_TOKEN="6e531ec041f64580582bca34414dc2abc6b03a7e";
 /* Bump this every time index.html or sw.js changes, so it's visible in Settings/Menu
    and you can tell at a glance whether a phone has picked up the latest update. */
-const APP_VERSION="v10";
+const APP_VERSION="v11";
 function bootWipeOut(){
   const saved=localGet(LK.cfg,null)||BUILTIN_FIREBASE_CONFIG;
   applyTheme(localGet(LK.theme,null));
@@ -1170,15 +1170,45 @@ function emptyState(t,s){return `<div class="empty"><svg viewBox="0 0 24 24" fil
 async function advanceQueue(id){
   const e=entries.find(x=>x.id===id);if(!e)return;
   const ns=nextQueueStatus(e.status||"waiting");
+  if(ns==="done"){promptPaymentForDone(id);return;}
   try{
     await shopCol("entries").doc(id).update({status:ns,statusUpdatedAt:Date.now()});
     haptic();
-    if(ns==="done"&&e.phone&&config.waAutoPrompt!==false){
-      promptWhatsApp(id);
-    }else{
-      toast(ns==="washing"?"Wash started":"Wash marked done");
-    }
+    toast("Wash started");
   }catch(err){toast("Could not update: "+err.message,"err");}
+}
+/* Payment isn't asked at wash creation anymore — this is where it's actually decided,
+   the moment the wash is marked Done, since that's when you really know how they paid. */
+function promptPaymentForDone(id){
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  const amount=e.amount||0;
+  let pay=(e.due>0&&e.received>0)?"Partial":(e.due>0?"Due":(e.mode||"Cash"));
+  openSheet("Mark wash done",`
+    <div class="muted" style="font-size:13px;margin-bottom:12px">${esc(e.vehicleNumber||"Vehicle")} &middot; ${money(amount)} &mdash; how did the customer pay?</div>
+    <div class="paychip" id="dPay">${["Cash","UPI","Partial","Due"].map(p=>`<button type="button" data-pay="${p}" class="${pay===p?"on":""}">${p}</button>`).join("")}</div>
+    <div class="field" id="dRecvHost" style="display:${pay==="Partial"?"block":"none"};margin-top:12px"><label>Amount received</label><input id="dRecv" type="number" inputmode="decimal" placeholder="0" value="${e.received||""}"><div class="hint" id="dDueHint"></div></div>
+  `,[
+    {label:"Cancel",cls:"ghost",fn:closeSheet},
+    {label:"Confirm & mark done",cls:"primary",fn:async()=>{
+      let received,due,mode;
+      if(pay==="Due"){received=0;due=amount;mode="Cash";}
+      else if(pay==="Partial"){received=Math.min(amount,parseFloat($("#dRecv").value)||0);due=Math.max(0,amount-received);mode="Cash";}
+      else{received=amount;due=0;mode=pay;}
+      try{
+        await shopCol("entries").doc(id).update({status:"done",received,due,mode,statusUpdatedAt:Date.now(),updatedAt:Date.now()});
+        closeSheet();haptic();
+        if(e.phone&&config.waAutoPrompt!==false)promptWhatsApp(id);
+        else toast("Wash marked done");
+      }catch(err){toast("Could not update: "+err.message,"err");}
+    }}
+  ]);
+  const chips=$("#dPay");
+  function setPay(p){pay=p;chips.querySelectorAll("[data-pay]").forEach(b=>b.classList.toggle("on",b.dataset.pay===p));
+    $("#dRecvHost").style.display=p==="Partial"?"block":"none";updateHint();}
+  chips.querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>setPay(b.dataset.pay));
+  function updateHint(){const rec=parseFloat($("#dRecv").value)||0;const due=Math.max(0,amount-rec);
+    $("#dDueHint").textContent=pay==="Partial"?money(due)+" will be marked as due":"";}
+  const dRecvEl=$("#dRecv");if(dRecvEl)dRecvEl.oninput=updateHint;
 }
 function sendWhatsApp(id){
   const e=entries.find(x=>x.id===id);if(!e)return;
@@ -1690,8 +1720,8 @@ $("#menuBtn").onclick=openMenu;
 /* ============================ Wash form ============================ */
 function openWashForm(id){
   const e=id?entries.find(x=>x.id===id):null;
-  const d=e||{date:todayDate,vehicleType:"",service:"",vehicleNumber:"",vehicleName:"",name:"",phone:"",amount:"",mode:"Cash",received:"",due:0,notes:"",status:"waiting"};
-  const pay=e?(e.due>0&&e.received>0?"Partial":e.due>0?"Due":e.mode):"Cash";
+  const d=e||{date:todayDate,vehicleType:"",service:"",vehicleNumber:"",vehicleName:"",name:"",phone:"",amount:"",mode:null,received:"",due:0,notes:"",status:"waiting"};
+  const pay=e?(e.due>0&&e.received>0?"Partial":e.due>0?"Due":e.mode):null;
   const veh=config.vehicleTypes&&config.vehicleTypes.length?config.vehicleTypes:DEFAULT_VEH;
   const svc=config.services&&config.services.length?config.services:DEFAULT_SERVICES;
   openSheet(id?"Edit wash":"Add wash",`
@@ -1709,27 +1739,27 @@ function openWashForm(id){
       <div class="field"><label>Phone</label><input id="wPhone" type="tel" placeholder="Phone" value="${esc(d.phone)}" inputmode="tel" autocomplete="tel"></div>
     </div>
     <div class="field err-host" id="wAmtHost"><label>Amount <span class="req">*</span></label><input id="wAmt" type="number" inputmode="decimal" placeholder="0" value="${esc(d.amount)}"><div class="hint" id="wAmtHint"></div><div class="errmsg">Enter a valid amount</div></div>
-    <div class="field"><label>Payment</label>
+    ${id?`<div class="field"><label>Payment</label>
       <div class="paychip" id="wPay">${["Cash","UPI","Partial","Due"].map(p=>`<button type="button" data-pay="${p}" class="${pay===p?"on":""}">${p}</button>`).join("")}</div>
     </div>
     <div class="field" id="wRecvHost" style="display:${pay==="Partial"?"block":"none"}"><label>Amount received</label><input id="wRecv" type="number" inputmode="decimal" placeholder="0" value="${esc(d.received)}"><div class="hint" id="wDueHint"></div></div>
-    <button type="button" class="btn ghost block" id="wCollect" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="7" rx="1.5"/><path d="M14 15h3v5M20 14v6"/></svg>Show UPI QR to collect</button>
+    <button type="button" class="btn ghost block" id="wCollect" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="7" rx="1.5"/><path d="M14 15h3v5M20 14v6"/></svg>Show UPI QR to collect</button>`:`<div class="hint" style="margin:-6px 2px 14px">Payment isn't asked for now &mdash; you'll pick how they paid when you mark this wash Done.</div>`}
     <div class="field"><label>Notes</label><textarea id="wNotes" placeholder="Optional">${esc(d.notes)}</textarea></div>
   `,[
     ...(id?[{label:"Delete",cls:"danger",fn:async()=>{if(confirm("Delete this wash entry?")){try{await shopCol("entries").doc(id).delete();closeSheet();toast("Wash deleted");}catch(err){toast("Could not delete: "+err.message,"err");}}}}]:[]),
     ...((id&&e&&e.due>0)?[{label:"Settle due ("+money(e.due)+")",cls:"ghost",fn:()=>settleEntry(id)}]:[]),
     {label:id?"Save":"Add wash",cls:"primary",fn:()=>saveWash(id)}
   ]);
-  // payment chip logic
+  // payment chip logic (only present when editing an existing wash; a brand-new wash defers payment to "Mark done")
   let payMode=pay;
   const chips=$("#wPay");
-  function setPay(p){payMode=p;chips.querySelectorAll("[data-pay]").forEach(b=>b.classList.toggle("on",b.dataset.pay===p));
-    $("#wRecvHost").style.display=p==="Partial"?"block":"none";updateDueHint();}
-  chips.querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>setPay(b.dataset.pay));
-  function updateDueHint(){const amt=parseFloat($("#wAmt").value)||0;const rec=parseFloat($("#wRecv").value)||0;
-    const due=Math.max(0,amt-rec);$("#wDueHint").textContent=payMode==="Partial"?money(due)+" will be marked as due":"";}
+  function setPay(p){payMode=p;if(chips)chips.querySelectorAll("[data-pay]").forEach(b=>b.classList.toggle("on",b.dataset.pay===p));
+    const rh=$("#wRecvHost");if(rh)rh.style.display=p==="Partial"?"block":"none";updateDueHint();}
+  if(chips)chips.querySelectorAll("[data-pay]").forEach(b=>b.onclick=()=>setPay(b.dataset.pay));
+  function updateDueHint(){const dh=$("#wDueHint");if(!dh)return;const amt=parseFloat($("#wAmt").value)||0;const rec=parseFloat(($("#wRecv")||{}).value)||0;
+    const due=Math.max(0,amt-rec);dh.textContent=payMode==="Partial"?money(due)+" will be marked as due":"";}
   $("#wAmt").oninput=()=>{amtTouched=true;updateDueHint();};
-  $("#wRecv").oninput=updateDueHint;
+  const wRecvEl=$("#wRecv");if(wRecvEl)wRecvEl.oninput=updateDueHint;
   // catalog price auto-fill (only until the user edits the amount manually)
   let amtTouched=!!(d.amount);
   function applyCatalogPrice(){
@@ -1793,7 +1823,8 @@ function openWashForm(id){
     }catch(err){toast("Scan failed: "+((err&&err.message)||"unknown error"),"err");}
     finally{btn.disabled=false;btn.innerHTML=orig;ev.target.value="";}
   };
-  $("#wCollect").onclick=()=>{const amt=parseFloat($("#wAmt").value)||0;if(!(amt>0)){toast("Enter an amount first","err");return;}openUpiPay(amt,wNum.value.trim(),()=>setPay("UPI"));};
+  const wCollectEl=$("#wCollect");
+  if(wCollectEl)wCollectEl.onclick=()=>{const amt=parseFloat($("#wAmt").value)||0;if(!(amt>0)){toast("Enter an amount first","err");return;}openUpiPay(amt,wNum.value.trim(),()=>setPay("UPI"));};
   window._getPay=()=>payMode;
 }
 async function saveWash(id){
@@ -1806,7 +1837,8 @@ async function saveWash(id){
   $("#wAmtHost").classList.toggle("err",!(amount>=0&&!isNaN(amount)));if(!(amount>=0&&!isNaN(amount)))ok=false;
   if(!ok){toast("Please fix the highlighted fields","err");return;}
   let received,due,mode;
-  if(payMode==="Due"){received=0;due=amount;mode="Cash";}
+  if(!payMode){received=0;due=amount;mode=null;} // new wash, no payment chosen yet — decided when marked Done
+  else if(payMode==="Due"){received=0;due=amount;mode="Cash";}
   else if(payMode==="Partial"){received=Math.min(amount,parseFloat($("#wRecv").value)||0);due=Math.max(0,amount-received);mode="Cash";}
   else{received=amount;due=0;mode=payMode;}
   const existing=id?entries.find(x=>x.id===id):null;
