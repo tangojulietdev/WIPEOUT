@@ -961,7 +961,7 @@ const BUILTIN_FIREBASE_CONFIG={
 const BUILTIN_PR_TOKEN="6e531ec041f64580582bca34414dc2abc6b03a7e";
 /* Bump this every time index.html or sw.js changes, so it's visible in Settings/Menu
    and you can tell at a glance whether a phone has picked up the latest update. */
-const APP_VERSION="v11";
+const APP_VERSION="v12";
 function bootWipeOut(){
   const saved=localGet(LK.cfg,null)||BUILTIN_FIREBASE_CONFIG;
   applyTheme(localGet(LK.theme,null));
@@ -2059,7 +2059,23 @@ function openEmployeeLoginForm(){
 bootWipeOut();
 
 if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("sw.js").then(reg=>{
+      reg.update().catch(()=>{});
+      // browsers only auto-check for a new service worker ~once/24h; force a check
+      // every time the app is opened or comes back to the foreground so updates
+      // (like this one) land the same day instead of waiting up to a day.
+      document.addEventListener("visibilitychange",()=>{
+        if(document.visibilityState==="visible")reg.update().catch(()=>{});
+      });
+    }).catch(()=>{});
+  });
+  let swReloaded=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(swReloaded)return;
+    swReloaded=true;
+    location.reload();
+  });
 }
 
 </script>

@@ -1,6 +1,6 @@
 /* Wipe Out service worker: caches the app shell only (install + fast loads).
    All data lives in Firestore, so the app needs a live connection to work. */
-const CACHE = "wipeout-v11";
+const CACHE = "wipeout-v12";
 const ASSETS = [
   "./",
   "./index.html",
