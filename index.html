@@ -118,7 +118,7 @@ nav.bottom button .dot{position:absolute; transform:translate(13px,-2px); width:
 .muted{color:var(--text-2)}
 .pill{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px;
   font-size:12px; font-weight:600; line-height:1.4}
-.pill.cash{background:var(--success-soft); color:var(--success)}
+.pill.cash{background:var(--surface-3); color:var(--text-2)}
 .pill.upi{background:#e3edfd; color:var(--upi)}
 html[data-theme="dark"] .pill.upi{background:#10233f}
 .pill.due{background:var(--danger-soft); color:var(--danger)}
@@ -142,12 +142,12 @@ html[data-theme="dark"] .pill.upi{background:#10233f}
 
 /* Wash entry card */
 .entry{display:flex; align-items:center; gap:13px; padding:13px 14px;
-  background:var(--surface); border:1px solid var(--border); border-left-width:4px;
+  background:var(--surface); border:2px solid var(--border);
   border-radius:var(--r-md); box-shadow:var(--shadow-1); margin-bottom:9px;
   transition:transform .15s, box-shadow .15s}
 .entry:active{transform:scale(.995)}
-.entry.closed{border-left-color:var(--success)}
-.entry.pending{border-left-color:var(--warning)}
+.entry.closed{border-color:var(--success)}
+.entry.pending{border-color:var(--warning)}
 .entry .amt .closedbadge{display:inline-flex; align-items:center; gap:3px; background:var(--success-soft);
   color:var(--success); font-size:10.5px; font-weight:700; padding:2.5px 8px; border-radius:999px;
   margin-bottom:5px; letter-spacing:.01em; white-space:nowrap}
@@ -408,7 +408,8 @@ html[data-theme="dark"] .qseg button .n{background:rgba(255,255,255,.12)}
 .qpill.waiting{background:var(--warning-soft); color:var(--warning)}
 .qpill.washing{background:#e3edfd; color:var(--upi)}
 html[data-theme="dark"] .qpill.washing{background:#10233f}
-.qpill.done{background:var(--success-soft); color:var(--success)}
+.qpill.done{background:#ede4fb; color:var(--other)}
+html[data-theme="dark"] .qpill.done{background:#2a1f42}
 .entry .qact{display:flex; gap:6px; margin-top:8px}
 .entry .qact button{padding:6px 11px; border-radius:9px; font-size:11.5px; font-weight:700; background:var(--surface-3); color:var(--text-2)}
 .entry .qact button.go{background:var(--primary); color:var(--on-primary)}
@@ -894,7 +895,7 @@ const BUILTIN_FIREBASE_CONFIG={
 const BUILTIN_PR_TOKEN="6e531ec041f64580582bca34414dc2abc6b03a7e";
 /* Bump this every time index.html or sw.js changes, so it's visible in Settings/Menu
    and you can tell at a glance whether a phone has picked up the latest update. */
-const APP_VERSION="v7";
+const APP_VERSION="v8";
 function bootWipeOut(){
   const saved=localGet(LK.cfg,null)||BUILTIN_FIREBASE_CONFIG;
   applyTheme(localGet(LK.theme,null));
